@@ -1,0 +1,10 @@
+.root {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.menu {
+  display: flex;
+  gap: 8px;
+  margin: 16px 4px;
+}
