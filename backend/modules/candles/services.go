@@ -14,7 +14,18 @@ func GetCandleByTime(instrumentId string, time time.Time) (InvestCandle, error) 
 	})
 
 	if result.Error != nil {
-		return exist, errors.New("Not found")
+		return exist, errors.New("not found")
+	}
+
+	return exist, nil
+}
+
+func GetCandlesByPeriod(instrumentId string, startTime string, endTime string) ([]InvestCandle, error) {
+	var exist []InvestCandle
+	result := data.DB.Where("time BETWEEN ?, ? AND  instrument_id = ?", startTime, endTime, instrumentId).Find(&exist)
+
+	if result.Error != nil {
+		return exist, errors.New("not found")
 	}
 
 	return exist, nil

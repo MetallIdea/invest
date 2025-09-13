@@ -5,9 +5,11 @@ import (
 	"netdesk/modules/auth"
 	"netdesk/modules/bonds"
 	"netdesk/modules/candles"
+	"netdesk/modules/favorites"
 	"netdesk/modules/files"
 	"netdesk/modules/permissions"
 	"netdesk/modules/roles"
+	"netdesk/modules/suggestions"
 	"netdesk/modules/users"
 	"os"
 
@@ -47,6 +49,9 @@ func NewRouter() *gin.Engine {
 
 		bonds.InitModule(api)
 		candles.InitModule(api)
+
+		favorites.InitModule(api)
+		suggestions.InitModule(api)
 	}
 
 	return router

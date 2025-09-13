@@ -27,15 +27,17 @@ func Request[T interface{}](params RequestParams) T {
 		req.Header.Add(key, params.Headers[key])
 	}
 
+	var result T
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		fmt.Println("No response from request", err)
+		return result
 	}
-	defer resp.Body.Close()
 
 	body, _ := io.ReadAll(resp.Body)
 
-	var result T
+	defer resp.Body.Close()
+
 	if err := json.Unmarshal(body, &result); err != nil { // Parse []byte to go struct pointer
 		fmt.Println("Can not unmarshal JSON", err)
 	}
