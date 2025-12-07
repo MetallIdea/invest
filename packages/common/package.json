@@ -1,0 +1,19 @@
+{
+  "name": "common",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "tsx main.ts",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "drizzle-orm": "0.45.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.5",
+    "typescript": "^5"
+  }
+}
