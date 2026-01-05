@@ -4,11 +4,16 @@
   "private": true,
   "scripts": {
     "start": "tsx main.ts",
+    "generate": "npx drizzle-kit generate",
+    "migrate": "npx drizzle-kit migrate",
+    "update": "npx drizzle-kit push",
     "lint": "eslint"
   },
   "dependencies": {
     "dotenv": "^17.2.3",
-    "drizzle-orm": "0.45.0"
+    "drizzle-orm": "^0.45.1",
+    "drizzle-kit": "^0.31.8",
+    "pg": "^8.16.3"
   },
   "devDependencies": {
     "@types/node": "^20",

@@ -1,8 +1,8 @@
-import { decrypt, encrypt } from "@/utils/encryption";
-import { users } from "common/entities/users";
+import { decrypt, encrypt } from "./encryption";
+import { users } from "common/src/entities/users";
 import { cookies } from "next/headers";
 
-export async function getUser() {
+export async function getUser(): Promise<typeof users.$inferSelect | null> {
   const cookieStore = await cookies();
 
   const userString = cookieStore.get("user");

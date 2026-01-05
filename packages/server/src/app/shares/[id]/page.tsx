@@ -1,10 +1,11 @@
-import { db } from "common/data/db";
+import { db } from "common/src/data/db";
 import styles from "./page.module.css";
-import { shares } from "common/entities/shares";
-import { candles } from "common/entities/candles";
+import { shares } from "common/src/entities/shares";
+import { candles } from "common/src/entities/candles";
+import { candlesParams } from "common/src/entities/candlesParams";
 import { desc, eq } from "drizzle-orm";
 import cn from "classnames";
-import { calcBuy, calcSell } from 'common/calculates/suggestions';
+import { calcBuy } from 'common/src/calculates/calcSuggestions';
 import { CandleCharts } from "@/components/charts/CandleCharts";
 
 export default async function Share({ params }: {
@@ -13,7 +14,8 @@ export default async function Share({ params }: {
     const { id } = await params;
 
     const [share] = await db.select().from(shares).where(eq(shares.id, id));
-    const allCandles = await db.select().from(candles).where(eq(candles.instrumentId, share.figi)).orderBy(desc(candles.time));
+    const allCandles = await db.select().from(candles).where(eq(candles.instrumentId, share.figi))
+        .orderBy(desc(candles.time));
 
     return (
         <div className={styles.page}>

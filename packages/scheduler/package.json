@@ -3,23 +3,33 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "tsx src/main.ts",
+    "dev": "next dev -p 4001",
+    "build": "next build",
+    "start": "next start -p 4001",
     "lint": "eslint"
   },
   "dependencies": {
+    "antd": "^6.1.1",
+    "apexcharts": "^5.3.6",
+    "classnames": "2.5.1",
+    "crypto-js": "^4.2.0",
     "dotenv": "^17.2.3",
-    "drizzle-orm": "0.45.0",
+    "drizzle-orm": "^0.45.1",
+    "next": "^16.0.10",
     "node-schedule": "^2.1.1",
     "pg": "^8.16.3",
     "react": "19.2.0",
-    "react-dom": "19.2.0",
-    "tsx": "4.20.6",
-    "typescript": "^5"
+    "react-apexcharts": "^1.9.0",
+    "react-dom": "19.2.0"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/node-schedule": "^2.1.8",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "baseline-browser-mapping": "^2.8.32",
     "eslint": "^9",
-    "eslint-config-next": "16.0.5"
+    "eslint-config-next": "16.0.5",
+    "typescript": "^5"
   }
 }

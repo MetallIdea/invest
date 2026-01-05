@@ -1,11 +1,10 @@
 import styles from "./page.module.css";
 import { eq, gt, or } from "drizzle-orm";
-import { suggestions } from 'common/entities/suggestions';
-import { shares } from 'common/entities/shares';
-import { db } from "common/data/db";
-import { Button } from "@vkontakte/vkui";
+import { suggestions } from 'common/src/entities/suggestions';
+import { shares } from 'common/src/entities/shares';
+import { db } from "common/src/data/db";
 import { BaseCard } from "@/components/cards/BaseCard";
-import { dateFormat } from "@/utils/time";
+import { dateFormat } from "common/src/utils/time";
 
 export default async function Home() {
   const date = new Date();
@@ -35,11 +34,11 @@ export default async function Home() {
                 key={suggestion.id}
                 className={styles.item}
                 title={<a href={`/shares/${share.id}`}>{share.name}</a>}
-                rightTitle={<Button
+                rightTitle={<a
                   href={`https://www.tbank.ru/invest/stocks/${share.ticker}`}
                   target={'_blank'}
                 >{suggestion.sell ? 'Продать' : 'Купить'}
-                </Button>}
+                </a>}
                 items={[
                   {
                     value: suggestion.buy,
@@ -48,7 +47,7 @@ export default async function Home() {
                     value: suggestion.buyTime ? dateFormat(suggestion.buyTime) : null,
                   },
                   {
-                    value: <div className={suggestion.sell - suggestion.buy > 0 ? styles.green : styles.red}>{suggestion.sell}</div>
+                    value: <div className={suggestion.sell && suggestion.buy && suggestion.sell - suggestion.buy > 0 ? styles.green : styles.red}>{suggestion.sell}</div>
                   },
                   {
                     value: suggestion.sellTime ? dateFormat(suggestion.sellTime) : null,

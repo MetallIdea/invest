@@ -3,7 +3,7 @@ import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
   // Required: Specifies the path(s) to your schema file(s). Can use glob patterns.
-  schema: "../common/entities/*.ts",
+  schema: "./src/entities/*.ts",
 
   // Required: Specifies the database dialect. Options: 'postgresql', 'mysql', 'sqlite', 'turso', 'singlestore'
   dialect: "postgresql",

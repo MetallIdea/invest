@@ -1,0 +1,48 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1765653936934,
+      "tag": "0000_plain_blue_shield",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1766079956490,
+      "tag": "0001_good_luckman",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1766426704715,
+      "tag": "0002_tiny_nekra",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1767066868450,
+      "tag": "0003_careless_la_nuit",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1767067684446,
+      "tag": "0004_outgoing_medusa",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1767583912869,
+      "tag": "0005_burly_arclight",
+      "breakpoints": true
+    }
+  ]
+}

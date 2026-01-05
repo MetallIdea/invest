@@ -1,9 +1,9 @@
-import { db } from "common/data/db";
-import { candles } from "common/entities/candles";
-import { shares } from "common/entities/shares";
+import { db } from "common/src/data/db";
+import { candles } from "common/src/entities/candles";
+import { shares } from "common/src/entities/shares";
+import { fetchCandles } from "common/src/requests/cnadles";
 import { desc, eq } from "drizzle-orm";
-import { calcCandle, calcPercent } from "../utils/candles";
-import { globalStore } from "../globalStore";
+import { calcCandle, calcPercent } from "common/src/utils/candles";
 
 export async function fetchLastCandles() {
   console.log("Start fetchLastCandles");
@@ -31,31 +31,20 @@ export async function fetchLastCandles() {
     if (lastCandle?.time) {
       // Если свеча есть то берем ее время
       startTime = new Date(lastCandle.time);
-      startTime.setDate(startTime.getDate() + 1);
+      startTime.setDate(startTime.getDate());
     } else {
       startTime.setMonth(startTime.getMonth() - 12);
     }
     startTimeISO = startTime.toISOString();
 
     // Делаем запрос в апи инвестиций
-    const response = await fetch(
-      `${globalStore.investApiUrl}/rest/tinkoff.public.invest.api.contract.v1.MarketDataService/GetCandles`,
-      {
-        method: "POST",
-        headers: new Headers({
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${globalStore.investApiToken}`,
-        }),
-        body: JSON.stringify({
-          from: startTimeISO,
-          to: endTimeISO,
-          interval: "CANDLE_INTERVAL_DAY",
-          candleSourceType: "CANDLE_SOURCE_UNSPECIFIED",
-          instrumentId: allShares[i].figi,
-          limit: 2400,
-        }),
-      }
-    );
+    const response = await fetchCandles({
+      investApiUrl: process.env.TINVEST_API_URL!,
+      investApiToken: process.env.TINVEST_API_TOKEN!,
+      instrumentId: allShares[i].figi,
+      startTime: startTimeISO,
+      endTime: endTimeISO,
+    });
     let data: any = { candles: [] };
 
     if (response.status === 200) {
@@ -79,18 +68,35 @@ export async function fetchLastCandles() {
         const min = Math.min(open, close);
         const max = Math.max(open, close);
 
-        await db.insert(candles).values({
-          instrumentId: allShares[i].figi,
-          time: new Date(candle.time),
-          open,
-          close,
-          high,
-          low,
+        const fields = {
+          open: calcCandle(candle.open),
+          close: calcCandle(candle.close),
+          low: calcCandle(candle.low),
+          high: calcCandle(candle.high),
           diff: calcPercent(open, close),
           diffLow: Math.abs(calcPercent(min, low)),
           diffHigh: Math.abs(calcPercent(max, high)),
           isComplete: candle.isComplete,
-        });
+        };
+
+        if (
+          lastCandle &&
+          new Date(lastCandle.time).getTime() ===
+            new Date(candle.time).getTime()
+        ) {
+          await db
+            .update(candles)
+            .set({
+              ...fields,
+            })
+            .where(eq(candles.id, lastCandle.id));
+        } else {
+          await db.insert(candles).values({
+            instrumentId: allShares[i].figi,
+            time: new Date(candle.time),
+            ...fields,
+          });
+        }
       }
     } else {
       console.log("Empty candles", data);

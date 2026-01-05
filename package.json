@@ -2,5 +2,9 @@
   "name": "invest",
   "version": "0.1.0",
   "private": true,
-  "workspaces": ["packages/common", "packages/server", "packages/scheduler"]
+  "scripts": {
+     "scheduler": "npm start --workspace=scheduler",
+     "server": "npm start --workspace=server"
+  },
+  "workspaces": ["packages/common", "packages/scheduler", "packages/server"]
 }

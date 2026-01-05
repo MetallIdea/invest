@@ -1,8 +1,9 @@
-import { Button, Input } from "@vkontakte/vkui"
-import { db } from "common/data/db"
-import { users } from "common/entities/users"
+import styles from './page.module.css';
+import { db } from "common/src/data/db"
+import { users } from "common/src/entities/users"
 import { and, eq } from "drizzle-orm"
-import { setUser } from "@/utils/user"
+import { setUser } from "common/src/utils/user"
+import { Button, Input } from "antd"
 
 export default function Login() {
     async function createInvoice(formData: FormData) {
@@ -17,13 +18,18 @@ export default function Login() {
                 eq(users.login, userData.login.toString()),
                 eq(users.password, userData.password.toString())
             )
-        )
-        setUser(user);
+        );
+
+        if (user) {
+            await setUser(user);
+        }
     }
 
-    return <form action={createInvoice}>
-        <Input name={'login'} type={'text'} />
-        <Input name={'password'} type={'password'} />
-        <Button type={'submit'} />
-    </form>
+    return <div className={styles.root}>
+        <form className={styles.form} action={createInvoice}>
+            <Input name={'login'} placeholder={'Логин'} type={'text'} />
+            <Input name={'password'} placeholder="Пароль" type={'password'} />
+            <Button type="primary" htmlType={'submit'}>Submit</Button>
+        </form>
+    </div>
 }
