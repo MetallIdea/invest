@@ -2,7 +2,7 @@ import { db } from "common/src/data/db";
 import { candles } from "common/src/entities/candles";
 import { shares } from "common/src/entities/shares";
 import { fetchCandles } from "common/src/requests/cnadles";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, gte, lte } from "drizzle-orm";
 import { calcCandle, calcPercent } from "common/src/utils/candles";
 
 export async function fetchOldCandles() {
@@ -42,6 +42,17 @@ export async function fetchOldCandles() {
         }
       }
 
+      const existCandles = await db
+        .select()
+        .from(candles)
+        .where(
+          and(
+            eq(candles.instrumentId, allShares[i].figi),
+            gte(candles.time, startTime),
+            lte(candles.time, endTime)
+          )
+        );
+
       if (data.candles) {
         for (let j = 0; j < data.candles.length; j++) {
           const candle = data.candles[j];
@@ -55,25 +66,20 @@ export async function fetchOldCandles() {
           const max = Math.max(open, close);
 
           const fields = {
-            open: calcCandle(candle.open),
-            close: calcCandle(candle.close),
-            low: calcCandle(candle.low),
-            high: calcCandle(candle.high),
+            open,
+            close,
+            low,
+            high,
             diff: calcPercent(open, close),
             diffLow: Math.abs(calcPercent(min, low)),
             diffHigh: Math.abs(calcPercent(max, high)),
             isComplete: candle.isComplete,
           };
 
-          const [existCandle] = await db
-            .select()
-            .from(candles)
-            .where(
-              and(
-                eq(candles.instrumentId, allShares[i].figi),
-                eq(candles.time, new Date(candle.time))
-              )
-            );
+          const existCandle = existCandles.find(
+            (currCandle) =>
+              currCandle.time.getTime() === new Date(candle.time).getTime()
+          );
 
           if (existCandle) {
             await db

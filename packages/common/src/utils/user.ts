@@ -13,6 +13,9 @@ export async function getUser(): Promise<typeof users.$inferSelect | null> {
 export async function setUser(user: typeof users.$inferSelect) {
   const cookieStore = await cookies();
 
+  const expires = new Date();
+  expires.setFullYear(expires.getFullYear() + 2);
+
   cookieStore.set({
     name: "user",
     value: encrypt(
@@ -22,5 +25,6 @@ export async function setUser(user: typeof users.$inferSelect) {
     ),
     httpOnly: true,
     path: "/",
+    expires: expires.getTime(),
   });
 }

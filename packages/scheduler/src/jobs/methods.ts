@@ -1,7 +1,7 @@
 "use server";
 
 import * as schedule from "node-schedule";
-import { getAllJobs, updateJob } from "common/src/repositories/jobs";
+import { getAllJobs, getJobById, updateJob } from "common/src/repositories/jobs";
 import { fetchActualShares } from "./fetchActualShares";
 import { fetchLastCandles } from "./fetchLastCandles";
 import { calculateSuggestions } from "./calculateSuggestions";
@@ -12,6 +12,7 @@ import { fetchOldCandles } from "./fetchOldCandles";
 const JOB_DEFINITIONS: Record<string, () => void> = {
   fetchActualShares: fetchActualShares,
   fetchLastCandles: fetchLastCandles,
+  fetchOldCandles: fetchOldCandles,
   calculateCandleParameters: calculateCandleParameters,
   calculateSuggestions: calculateSuggestions,
 };
@@ -33,4 +34,10 @@ export async function initJobs() {
 
     runningJobs.push(runningJob);
   });
+}
+
+export async function runJob(jobId: string) {
+  const job = await getJobById(jobId);
+  
+  await JOB_DEFINITIONS[job.method]();
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "invest_suggestions" ADD CONSTRAINT "invest_suggestions_instrument_id_invest_shares_id_fk" FOREIGN KEY ("instrument_id") REFERENCES "public"."invest_shares"("id") ON DELETE cascade ON UPDATE no action;

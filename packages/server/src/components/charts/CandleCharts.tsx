@@ -41,7 +41,8 @@ export const CandleCharts = ({ data }: Props) => {
             name: 'Candles',
             data: data.map((item) => ({
                 x: item.time,
-                y: [item.open, item.high, item.low, item.close,],
+                y: [item.open, item.high, item.low, item.close],
+                meta: 'test'
             }))
         },
         {

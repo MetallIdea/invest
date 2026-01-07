@@ -1,6 +1,6 @@
 'use client';
 
-import { initJobs } from '@/jobs/methods';
+import { initJobs, runJob } from '@/jobs/methods';
 import { Button, Input } from 'antd';
 import { Job } from 'common/src/entities/jobs';
 
@@ -12,6 +12,9 @@ export function HomePage({ jobs }: Props) {
     async function handleClick() {
         await initJobs();
     }
+    const handleJobClick = (jobId: string) => async () => {
+        runJob(jobId);
+    }
 
     return (
         <div>
@@ -22,6 +25,7 @@ export function HomePage({ jobs }: Props) {
                     <div>{job.method}</div>
                     <div>{job.lastRun?.toISOString()}</div>
                     <div>{job.nextRun?.toISOString()}</div>
+                    <Button onClick={handleJobClick(job.id)}>Запустить раз</Button>
                 </div>))}
             </div>
             <div>

@@ -6,6 +6,11 @@ export async function getAllJobs() {
   return await db.select().from(jobs);
 }
 
+export async function getJobById(id: string) {
+  const [job] = await db.select().from(jobs).where(eq(jobs.id, id));
+  return job;
+}
+
 export async function createJob(job: {
   name: string;
   schedule: string;

@@ -41,5 +41,10 @@ export async function initDb() {
       schedule: "* * * * *",
       method: "calculateSuggestions",
     });
+    await createJob({
+      name: "Получить все свечи",
+      schedule: "* * * * *",
+      method: "fetchOldCandles",
+    });
   }
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "invest_suggestions" ALTER COLUMN "instrument_id" SET DATA TYPE uuid;

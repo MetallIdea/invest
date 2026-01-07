@@ -5,7 +5,7 @@ import { candles } from "common/src/entities/candles";
 import { candlesParams } from "common/src/entities/candlesParams";
 import { desc, eq } from "drizzle-orm";
 import cn from "classnames";
-import { calcBuy } from 'common/src/calculates/calcSuggestions';
+import { calcBuy, calcSell } from 'common/src/calculates/calcSuggestions';
 import { CandleCharts } from "@/components/charts/CandleCharts";
 
 export default async function Share({ params }: {
@@ -37,6 +37,7 @@ export default async function Share({ params }: {
                         <div>{Math.round(candle.diffLow * 100) / 100}</div>
                         <div>{Math.round(candle.diffHigh * 100) / 100}</div>
                         <div>{calcBuy(allCandles, index) ? 'buy' : ''}</div>
+                        <div>{calcSell({ allCandles, index }) ? 'sell' : ''}</div>
                     </div>
                 ))}
             </div>

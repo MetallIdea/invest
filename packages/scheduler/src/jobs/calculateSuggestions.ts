@@ -42,12 +42,13 @@ export async function calculateSuggestions() {
       // Вычислить свечи
       if (!currentSuggestion && calcBuy(allCandles, j)) {
         currentSuggestion = {
-          instrumentId: allShares[i].figi,
+          instrumentId: allShares[i].id,
           strategyId: strategy.id,
           buy: candle.close,
           buyTime: candle.time,
           sell: null,
           sellTime: null,
+          stopLoss: candle.close * 0.8,
         };
         const [{ id }] = await db
           .insert(suggestions)

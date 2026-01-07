@@ -1,5 +1,5 @@
 export function calcCandle({ units, nano }: { units: string; nano: number }) {
-  return Number(units) + nano / 1000000000;
+  return Math.round(Number(units) + nano / 1000000000 * 100) / 100;
 }
 
 export function calcPercent(start: number, end: number) {
