@@ -12,6 +12,7 @@ type Props = {
         low: number;
         sma200: number;
         ema50: number;
+        tr: number;
         atr14: number;
     }[]
 }
@@ -29,6 +30,24 @@ const OPTIONS: ApexOptions = {
         type: 'datetime'
     },
     yaxis: [{
+        tooltip: {
+            enabled: true
+        }
+    },
+    {
+        show: false,
+        tooltip: {
+            enabled: true
+        }
+    },
+    {
+        show: false,
+        tooltip: {
+            enabled: true
+        }
+    },
+    {
+        opposite: true,
         tooltip: {
             enabled: true
         }
@@ -59,6 +78,14 @@ export const CandleCharts = ({ data }: Props) => {
             data: data.map((item) => ({
                 x: item.time,
                 y: item.ema50,
+            }))
+        },
+        {
+            name: 'ATR',
+            type: 'line',
+            data: data.map((item) => ({
+                x: item.time,
+                y: item.tr,
             }))
         }]
     });

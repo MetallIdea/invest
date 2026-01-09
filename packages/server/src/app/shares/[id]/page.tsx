@@ -21,7 +21,11 @@ export default async function Share({ params }: {
         <div className={styles.page}>
             <div>Название: {share.name}</div>
             <div>Тикер: {share.ticker}</div>
-            <div>Акции</div>
+            <div><a
+                href={`https://www.tbank.ru/invest/stocks/${share.ticker}`}
+                target={'_blank'}
+            >Перейти
+            </a></div>
             <div>
                 <CandleCharts data={allCandles} />
             </div>

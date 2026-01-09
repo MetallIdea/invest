@@ -5,7 +5,7 @@ export const calcBuy = (allCandles: Candle[], index: number) => {
   if (index < 30) {
     return false;
   }
-  const countDays = 4;
+  const countDays = 7;
 
   let coundProfitDays = 0;
 
@@ -55,7 +55,7 @@ export const calcSell = ({
   if (index < 30) {
     return false;
   }
-  const countDays = 4;
+  const countDays = 6;
 
   let countLossDays = 0;
 
