@@ -1,4 +1,4 @@
-import { pgTable, varchar, uuid } from "drizzle-orm/pg-core";
+import { pgTable, varchar, uuid, numeric } from "drizzle-orm/pg-core";
 import { baseEntity } from "../data/baseEntity";
 
 export const shares = pgTable("invest_shares", {
@@ -8,6 +8,9 @@ export const shares = pgTable("invest_shares", {
   countryOfRisk: varchar(),
   sector: varchar(),
   ticker: varchar(),
+  lot: numeric({
+    mode: "number",
+  }),
 });
 
 export type Share = typeof shares.$inferSelect;

@@ -1,0 +1,1 @@
+ALTER TABLE "invest_shares" ADD COLUMN "lot" numeric;
