@@ -9,3 +9,5 @@ export const shares = pgTable("invest_shares", {
   sector: varchar(),
   ticker: varchar(),
 });
+
+export type Share = typeof shares.$inferSelect;

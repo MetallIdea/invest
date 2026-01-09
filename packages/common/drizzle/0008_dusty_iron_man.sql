@@ -1,0 +1,1 @@
+ALTER TABLE "invest_suggestions" ADD COLUMN "max" numeric;

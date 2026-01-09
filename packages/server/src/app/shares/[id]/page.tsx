@@ -36,8 +36,6 @@ export default async function Share({ params }: {
                         <div>{Math.round(candle.diff * 100) / 100}</div>
                         <div>{Math.round(candle.diffLow * 100) / 100}</div>
                         <div>{Math.round(candle.diffHigh * 100) / 100}</div>
-                        <div>{calcBuy(allCandles, index) ? 'buy' : ''}</div>
-                        <div>{calcSell({ allCandles, index }) ? 'sell' : ''}</div>
                     </div>
                 ))}
             </div>

@@ -57,6 +57,13 @@
       "when": 1767763460558,
       "tag": "0007_fluffy_zaladane",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1767854878130,
+      "tag": "0008_dusty_iron_man",
+      "breakpoints": true
     }
   ]
 }

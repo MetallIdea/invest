@@ -1,34 +1,44 @@
 import { Candle } from "../entities/candles";
+import { Suggestion } from "../entities/suggestions";
 
 export const calcBuy = (allCandles: Candle[], index: number) => {
   if (index < 30) {
     return false;
   }
-  const candle = allCandles[index];
-  const prevCandle = allCandles[index - 1];
   const countDays = 10;
 
   let coundProfitDays = 0;
-  const koeff = 1.01;
 
-  for (let i = index - countDays; i < index; i++) {
+  const startIndex = index - countDays;
+
+  for (let i = 0; i < countDays; i++) {
     if (
-      allCandles[i - 1].sma200! < allCandles[i].sma200! &&
-      allCandles[i - 1].ema50! < allCandles[i].ema50!
+      allCandles[startIndex + i - 1].sma200! <
+      allCandles[startIndex + i].sma200!
     ) {
-      coundProfitDays++;
+      if (i > 3) {
+        if (
+          allCandles[startIndex + i - 1].ema50! <
+          allCandles[startIndex + i].ema50!
+        ) {
+          coundProfitDays++;
+        }
+      } else {
+        if (
+          allCandles[startIndex + i - 1].ema50! >
+          allCandles[startIndex + i].ema50!
+        ) {
+          coundProfitDays++;
+        }
+      }
     }
   }
 
-  if (
-    !prevCandle.ema50 ||
-    !prevCandle.sma200 ||
-    !candle.ema50 ||
-    !candle.sma200
-  ) {
-    return false;
-  }
-  return coundProfitDays >= 9;
+  return (
+    coundProfitDays >= 9 &&
+    allCandles[index - 1].sma200! < allCandles[index].sma200! &&
+    allCandles[index].ema50! > allCandles[index].sma200!
+  );
 };
 
 export const calcSell = ({
@@ -40,30 +50,34 @@ export const calcSell = ({
   allCandles: Candle[];
   index: number;
   days?: number;
-  currentSuggestion?: any;
+  currentSuggestion?: Suggestion;
 }) => {
   if (index < 30) {
     return false;
   }
-  const candle = allCandles[index];
-  const prevCandle = allCandles[index - 1];
-  const countLossDays = 5;
+  const countDays = 10;
 
-  let coundLossDays = 0;
+  let countLossDays = 0;
 
-  for (let i = index - countLossDays; i < index; i++) {
-    if (allCandles[i - 1].ema50! > allCandles[i].ema50!) {
-      coundLossDays++;
+  const startIndex = index - countDays;
+
+  for (let i = 0; i < countDays; i++) {
+    if (i > 3) {
+      if (
+        allCandles[startIndex + i - 1].ema50! >
+        allCandles[startIndex + i].ema50!
+      ) {
+        countLossDays++;
+      }
+    } else {
+      if (
+        allCandles[startIndex + i - 1].ema50! <
+        allCandles[startIndex + i].ema50!
+      ) {
+        countLossDays++;
+      }
     }
   }
 
-  if (
-    !prevCandle.ema50 ||
-    !prevCandle.sma200 ||
-    !candle.ema50 ||
-    !candle.sma200
-  ) {
-    return false;
-  }
-  return coundLossDays >= 3;
+  return countLossDays >= 9;
 };

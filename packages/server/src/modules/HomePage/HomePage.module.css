@@ -1,0 +1,28 @@
+.page {
+  margin: 0 16px;
+}
+
+.values {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.title {
+  width: 100%;
+  flex-grow: 1
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.green {
+  color: green;
+}
+
+.red {
+  color: red
+}

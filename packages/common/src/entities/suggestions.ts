@@ -18,8 +18,13 @@ export const suggestions = t.pgTable("invest_suggestions", {
   }),
   buyTime: t.timestamp(),
   sellTime: t.timestamp(),
+  max: t.numeric({
+    mode: "number",
+  }),
   strategyId: t
     .uuid()
     .notNull()
     .references(() => strategies.id, { onDelete: "cascade" }),
 });
+
+export type Suggestion = typeof suggestions.$inferSelect;

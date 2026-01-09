@@ -2,7 +2,7 @@ import { db } from "common/src/data/db";
 import { candles } from "common/src/entities/candles";
 import { shares } from "common/src/entities/shares";
 import { strategies } from "common/src/entities/strategies";
-import { suggestions } from "common/src/entities/suggestions";
+import { Suggestion, suggestions } from "common/src/entities/suggestions";
 import { calcBuy, calcSell } from "common/src/calculates/calcSuggestions";
 import { desc, eq } from "drizzle-orm";
 
@@ -35,7 +35,12 @@ export async function calculateSuggestions() {
       .orderBy(candles.time);
 
     let days = 0;
-    let currentSuggestion: any = null;
+    let currentSuggestion:
+      | (Partial<Suggestion> & {
+          instrumentId: Suggestion["instrumentId"];
+          strategyId: Suggestion["strategyId"];
+        })
+      | null = null;
 
     for (let j = 0; j < allCandles.length; j++) {
       const candle = allCandles[j];
@@ -48,11 +53,11 @@ export async function calculateSuggestions() {
           buyTime: candle.time,
           sell: null,
           sellTime: null,
-          stopLoss: candle.close * 0.8,
+          max: candle.close,
         };
         const [{ id }] = await db
           .insert(suggestions)
-          .values(currentSuggestion)
+          .values(currentSuggestion!)
           .returning({
             id: suggestions.id,
           });
@@ -68,20 +73,26 @@ export async function calculateSuggestions() {
       ) {
         currentSuggestion.sell = candle.close;
         currentSuggestion.sellTime = candle.time;
+        currentSuggestion.max = Math.max(
+          currentSuggestion.max ?? 0,
+          candle.close
+        );
 
         await db
           .update(suggestions)
           .set({
             sell: currentSuggestion.sell,
             sellTime: currentSuggestion.sellTime,
+            max: currentSuggestion.max,
           })
-          .where(eq(suggestions.id, currentSuggestion.id));
+          .where(eq(suggestions.id, currentSuggestion.id!));
 
-        money += currentSuggestion.sell - currentSuggestion.buy;
+        money += currentSuggestion.sell - currentSuggestion.buy!;
 
         currentSuggestion = null;
         days = 0;
-      } else {
+      } else if (currentSuggestion) {
+        currentSuggestion.max = Math.max(currentSuggestion.max!, candle.close);
         days++;
       }
     }
