@@ -14,6 +14,12 @@ type Props = {
         ema50: number;
         tr: number;
         atr14: number;
+    }[];
+    suggestions: {
+        buy: number;
+        sell: number;
+        buyTime: Date;
+        sellTime: Date;
     }[]
 }
 
@@ -27,34 +33,16 @@ const OPTIONS: ApexOptions = {
         align: 'left'
     },
     xaxis: {
-        type: 'datetime'
+        type: 'datetime',
     },
     yaxis: [{
         tooltip: {
             enabled: true
         }
-    },
-    {
-        show: false,
-        tooltip: {
-            enabled: true
-        }
-    },
-    {
-        show: false,
-        tooltip: {
-            enabled: true
-        }
-    },
-    {
-        opposite: true,
-        tooltip: {
-            enabled: true
-        }
-    }]
+    }],
 };
 
-export const CandleCharts = ({ data }: Props) => {
+export const CandleCharts = ({ data, suggestions }: Props) => {
     const [state, setState] = useState<ApexOptions>({
         series: [{
             name: 'Candles',
@@ -81,12 +69,28 @@ export const CandleCharts = ({ data }: Props) => {
             }))
         },
         {
-            name: 'ATR',
-            type: 'line',
-            data: data.map((item) => ({
-                x: item.time,
-                y: item.tr,
-            }))
+            name: 'Buy',
+            type: 'bar',
+            data: data.map((item) => {
+                const suggestion = suggestions.find((sug) => sug.buyTime.getTime() === item.time.getTime());
+                return {
+                    x: item.time,
+                    y: suggestion ? suggestion.buy : 0,
+                    columnWidthOffset: 5
+                }
+            })
+        },
+        {
+            name: 'Sell',
+            type: 'bar',
+            data: data.map((item) => {
+                const suggestion = suggestions.find((sug) => sug.sellTime?.getTime() === item.time.getTime());
+                return {
+                    x: item.time,
+                    y: suggestion?.sell ? suggestion.sell : 0,
+                    columnWidthOffset: 5
+                }
+            })
         }]
     });
 

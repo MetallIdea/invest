@@ -8,6 +8,8 @@ export const calcBuy = (allCandles: Candle[], index: number) => {
   const countDays = 7;
 
   let coundProfitDays = 0;
+  let coundProfitSMADays = 0;
+  let coundProfitEMADays = 0;
 
   const startIndex = index - countDays;
 
@@ -16,6 +18,13 @@ export const calcBuy = (allCandles: Candle[], index: number) => {
       allCandles[startIndex + i - 1].sma200! <
       allCandles[startIndex + i].sma200!
     ) {
+      coundProfitSMADays++;
+      if (
+          allCandles[startIndex + i - 1].ema50! <
+          allCandles[startIndex + i].ema50!
+        ) {
+          coundProfitEMADays++;
+        }
       if (i > 2) {
         if (
           allCandles[startIndex + i - 1].ema50! <
@@ -35,9 +44,12 @@ export const calcBuy = (allCandles: Candle[], index: number) => {
   }
 
   return (
-    coundProfitDays === countDays &&
-    allCandles[index - 1].sma200! < allCandles[index].sma200! &&
-    allCandles[index].ema50! > allCandles[index].sma200!
+    (coundProfitSMADays === countDays && coundProfitEMADays === countDays &&
+      allCandles[index - 1].ema50! < allCandles[index - 1].sma200! &&
+      allCandles[index].ema50! > allCandles[index].sma200!) ||
+    (coundProfitDays === countDays &&
+      allCandles[index - 1].sma200! < allCandles[index].sma200! &&
+      allCandles[index].ema50! > allCandles[index].sma200!)
   );
 };
 

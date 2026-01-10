@@ -3,19 +3,25 @@ import styles from "./page.module.css";
 import { shares } from "common/src/entities/shares";
 import { candles } from "common/src/entities/candles";
 import { candlesParams } from "common/src/entities/candlesParams";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, gte } from "drizzle-orm";
 import cn from "classnames";
 import { calcBuy, calcSell } from 'common/src/calculates/calcSuggestions';
 import { CandleCharts } from "@/components/charts/CandleCharts";
+import { suggestions } from "common/src/entities/suggestions";
 
 export default async function Share({ params }: {
     params: Promise<{ id: string }>
 }) {
     const { id } = await params;
 
+    const startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - 12);
+
     const [share] = await db.select().from(shares).where(eq(shares.id, id));
-    const allCandles = await db.select().from(candles).where(eq(candles.instrumentId, share.figi))
+    const allCandles = await db.select().from(candles).where(and(eq(candles.instrumentId, share.figi), gte(candles.time, startDate)))
         .orderBy(desc(candles.time));
+    const shareSuggestions = await db.select().from(suggestions).where(and(eq(suggestions.instrumentId, share.id), gte(suggestions.buyTime, startDate)))
+        .orderBy(desc(suggestions.buyTime));
 
     return (
         <div className={styles.page}>
@@ -27,7 +33,7 @@ export default async function Share({ params }: {
             >Перейти
             </a></div>
             <div>
-                <CandleCharts data={allCandles} />
+                <CandleCharts data={allCandles} suggestions={shareSuggestions} />
             </div>
             <div>
                 {allCandles.map((candle, index) => (
