@@ -5,71 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1765653936934,
-      "tag": "0000_plain_blue_shield",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1766079956490,
-      "tag": "0001_good_luckman",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1766426704715,
-      "tag": "0002_tiny_nekra",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1767066868450,
-      "tag": "0003_careless_la_nuit",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1767067684446,
-      "tag": "0004_outgoing_medusa",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1767583912869,
-      "tag": "0005_burly_arclight",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1767763435678,
-      "tag": "0006_brief_shen",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1767763460558,
-      "tag": "0007_fluffy_zaladane",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1767854878130,
-      "tag": "0008_dusty_iron_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1767970674817,
-      "tag": "0009_steady_mandroid",
+      "when": 1768023455200,
+      "tag": "0000_exotic_puma",
       "breakpoints": true
     }
   ]
