@@ -59,7 +59,6 @@ export const CandleCharts = ({ data, suggestions }: Props) => {
             data: data.map((item) => ({
                 x: item.time,
                 y: [item.open, item.high, item.low, item.close],
-                meta: 'test'
             }))
         },
         {
@@ -86,7 +85,7 @@ export const CandleCharts = ({ data, suggestions }: Props) => {
                 return {
                     x: item.time,
                     y: suggestion ? suggestion.buy : null,
-                    columnWidthOffset: 5
+                    columnWidthOffset: 3
                 }
             })
         },
@@ -143,7 +142,7 @@ export const CandleCharts = ({ data, suggestions }: Props) => {
                 <ReactApexChart options={OPTIONS} series={state.series} type="candlestick" height={350} />
             </div>
             <div>
-                <ReactApexChart options={OPTIONS_MACD} series={stateMACD.series} type="line" height={300} />
+                <ReactApexChart options={OPTIONS_MACD} series={stateMACD.series} type="line" height={350} />
             </div>
         </div>
     );
