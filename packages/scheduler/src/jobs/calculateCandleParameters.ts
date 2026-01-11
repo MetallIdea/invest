@@ -16,7 +16,10 @@ export async function calculateCandleParameters() {
   console.log("Start calculateCandleParameters");
   console.time("End calculateCandleParameters");
 
-  const k = calcKoeff(50);
+  const k50 = calcKoeff(50);
+  const k9 = calcKoeff(9);
+  const k12 = calcKoeff(12);
+  const k26 = calcKoeff(26);
 
   const allShares = await db
     .select()
@@ -39,17 +42,44 @@ export async function calculateCandleParameters() {
       const tr = calcTR(candle, allCandles[j - 1]);
 
       const newCandleParams: Partial<Candle> = {
+        sma50: calcSMA(allCandles.slice(j - 50, j)),
         sma200: calcSMA(allCandles.slice(j - 200, j)),
         tr,
       };
 
+      newCandleParams.ema9 = prevCandleParams?.ema9
+        ? calcEMA(candle.close, prevCandleParams.ema9, k9)
+        : candle.close;
+
+      newCandleParams.ema12 = prevCandleParams?.ema12
+        ? calcEMA(candle.close, prevCandleParams.ema12, k12)
+        : candle.close;
+
+      newCandleParams.ema26 = prevCandleParams?.ema26
+        ? calcEMA(candle.close, prevCandleParams.ema26, k26)
+        : candle.close;
+
       newCandleParams.ema50 = prevCandleParams?.ema50
-        ? calcEMA(candle, prevCandleParams.ema50, k)
-        : newCandleParams.sma200;
+        ? calcEMA(candle.close, prevCandleParams.ema50, k50)
+        : candle.close;
 
       newCandleParams.atr14 = prevCandleParams?.atr14
         ? calcATR(tr, prevCandleParams.atr14, 14)
         : calcATR(tr, calcAvgTR(allCandles.slice(j - 15, j)), 14);
+
+      newCandleParams.macd =
+        prevCandleParams?.ema26 && prevCandleParams.ema12
+          ? prevCandleParams?.ema12 - prevCandleParams.ema26
+          : null;
+
+      newCandleParams.signal = newCandleParams.macd && prevCandleParams?.signal
+        ? calcEMA(newCandleParams.macd, prevCandleParams.signal, k9)
+        : newCandleParams.macd;
+
+      newCandleParams.signalValue =
+        newCandleParams?.macd && newCandleParams.signal
+          ? newCandleParams?.macd - newCandleParams.signal
+          : null;
 
       await db
         .update(candles)

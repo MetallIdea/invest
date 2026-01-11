@@ -8,8 +8,8 @@ export function calcKoeff(n: number) {
   return 2 / (n + 1);
 }
 
-export function calcEMA(candle: Candle, prevEMA: number, k: number) {
-  return candle.close * k + prevEMA * (1 - k);
+export function calcEMA(close: number, prevEMA: number, k: number) {
+  return close * k + prevEMA * (1 - k);
 }
 
 export function calcTR(candle: Candle, prev: Candle) {

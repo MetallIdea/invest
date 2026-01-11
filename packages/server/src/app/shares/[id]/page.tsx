@@ -15,7 +15,7 @@ export default async function Share({ params }: {
     const { id } = await params;
 
     const startDate = new Date();
-    startDate.setMonth(startDate.getMonth() - 12);
+    startDate.setMonth(startDate.getMonth() - 6);
 
     const [share] = await db.select().from(shares).where(eq(shares.id, id));
     const allCandles = await db.select().from(candles).where(and(eq(candles.instrumentId, share.figi), gte(candles.time, startDate)))

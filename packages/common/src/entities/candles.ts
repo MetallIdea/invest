@@ -16,13 +16,15 @@ export const candles = t.pgTable("invest_candles", {
       mode: "number",
     })
     .notNull(),
-  low: t.numeric({
-    mode: "number",
-  })
+  low: t
+    .numeric({
+      mode: "number",
+    })
     .notNull(),
-  high: t.numeric({
-    mode: "number",
-  })
+  high: t
+    .numeric({
+      mode: "number",
+    })
     .notNull(),
   diff: t
     .numeric({
@@ -43,18 +45,39 @@ export const candles = t.pgTable("invest_candles", {
     mode: "number",
   }),
   isComplete: t.boolean(),
-    sma200: t.numeric({
-      mode: "number",
-    }),
-    ema50: t.numeric({
-      mode: "number",
-    }),
-    tr: t.numeric({
-      mode: "number",
-    }),
-    atr14: t.numeric({
-      mode: "number",
-    }),
+  sma50: t.numeric({
+    mode: "number",
+  }),
+  sma200: t.numeric({
+    mode: "number",
+  }),
+  macd: t.numeric({
+    mode: "number",
+  }),
+  signal: t.numeric({
+    mode: "number",
+  }),
+  signalValue: t.numeric({
+    mode: "number",
+  }),
+  ema9: t.numeric({
+    mode: "number",
+  }),
+  ema12: t.numeric({
+    mode: "number",
+  }),
+  ema26: t.numeric({
+    mode: "number",
+  }),
+  ema50: t.numeric({
+    mode: "number",
+  }),
+  tr: t.numeric({
+    mode: "number",
+  }),
+  atr14: t.numeric({
+    mode: "number",
+  }),
 });
 
 export type Candle = typeof candles.$inferInsert;
