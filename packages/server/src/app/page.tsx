@@ -10,15 +10,15 @@ export default async function Home() {
   const date = new Date();
 
   if (date.getDay() === 6 || date.getDay() === 0) {
-    date.setDate(date.getDate() - 3);
+    date.setDate(date.getDate() - 5);
   } else {
-    date.setDate(date.getDate() - 1);
+    date.setDate(date.getDate() - 3);
   }
 
   const lastSuggestions = await db.select().from(suggestions)
-    .where(or(gt(suggestions.buyTime, date), gt(suggestions.sellTime, date)))
+    .where(or(gt(suggestions.buyTime, date)))
     .innerJoin(shares, eq(shares.id, suggestions.instrumentId))
-    .orderBy(suggestions.sell);
+    .orderBy(desc(suggestions.sell));
 
   const allSuggestions = await db.select().from(suggestions)
     .innerJoin(shares, eq(shares.id, suggestions.instrumentId))

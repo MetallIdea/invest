@@ -1,6 +1,11 @@
 import { db } from "common/src/data/db";
 import { strategies } from "common/src/entities/strategies";
-import { createJob, deleteJob, getAllJobs } from "common/src/repositories/jobs";
+import {
+  createJob,
+  deleteAllJobsYesIWant,
+  deleteJob,
+  getAllJobs,
+} from "common/src/repositories/jobs";
 import { METHODS } from "http";
 
 export async function initDb() {
@@ -35,6 +40,11 @@ export async function initDb() {
       name: "Вычислить параметры",
       schedule: "* * * * *",
       method: "calculateCandleParameters",
+    });
+    await createJob({
+      name: "Вычислить параметры за 30 дней",
+      schedule: "* * * * *",
+      method: "calculateLast30CandleParameters",
     });
     await createJob({
       name: "Рассчитать свечи",

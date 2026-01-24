@@ -6,17 +6,14 @@ import { suggestions } from "common/src/entities/suggestions";
 import { calcBuy } from "common/src/calculates/calcSuggestions";
 import { eq } from "drizzle-orm";
 
-export async function calculateSuggestions() {
-  console.log("Start calculateSuggestions");
-  console.time("End calculateSuggestions");
+export async function calculateLastSuggestions() {
+  console.log("Start calculateLastSuggestions");
+  console.time("End calculateLastSuggestions");
 
   const [strategy] = await db
     .select()
     .from(strategies)
     .where(eq(strategies.name, "Простая стратегия"));
-
-  // Удаляем все вычисления стратегии
-  await db.delete(suggestions).where(eq(suggestions.strategyId, strategy.id));
 
   const allShares = await db
     .select()
@@ -36,18 +33,23 @@ export async function calculateSuggestions() {
       const candle = allCandles[j];
       // Вычислить свечи
       if (calcBuy(allCandles, j)) {
-        await db.insert(suggestions).values({
+        await db
+          .insert(suggestions)
+          .values({
           instrumentId: allShares[i].id,
           strategyId: strategy.id,
           buy: candle.close,
           buyTime: candle.time,
-          sell: candle.diff,
+          sell: null,
           sellTime: null,
           max: candle.close,
-        });
+        }!)
+          .returning({
+            id: suggestions.id,
+          });
       }
     }
   }
 
-  console.timeEnd("End calculateSuggestions");
+  console.timeEnd("End calculateLastSuggestions");
 }

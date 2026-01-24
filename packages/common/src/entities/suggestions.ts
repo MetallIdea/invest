@@ -21,6 +21,7 @@ export const suggestions = t.pgTable("invest_suggestions", {
   max: t.numeric({
     mode: "number",
   }),
+  falsePositive: t.boolean().default(false),
   strategyId: t
     .uuid()
     .notNull()

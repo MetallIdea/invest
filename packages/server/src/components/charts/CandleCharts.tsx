@@ -35,8 +35,7 @@ const OPTIONS: ApexOptions = {
 
 const OPTIONS_MACD: ApexOptions = {
     chart: {
-        type: 'line',
-        height: 350
+        type: 'candlestick'
     },
     title: {
         text: 'MACD Chart',
@@ -59,10 +58,24 @@ export const CandleCharts = ({ data, suggestions }: Props) => {
             data: data.map((item) => ({
                 x: item.time,
                 y: [item.open, item.high, item.low, item.close],
+                fillColor: (() => {
+                    const suggestionBuy = suggestions.find((sug) => sug.buyTime.getTime() === item.time.getTime());
+                    const suggestionSell = suggestions.find((sug) => (sug.sellTime && sug.sellTime.getTime() === item.time.getTime()));
+
+                    if (suggestionSell?.sell) {
+                        return '#b00000ff'
+                    }
+
+                    if (suggestionBuy?.buy) {
+                        return '#009c00ff'
+                    }
+
+                    return item.close > item.open ? '#00FF00' : '#ff0000'
+                })()
             }))
         },
         {
-            name: 'SMA',
+            name: 'SMA50',
             type: 'line',
             data: data.map((item) => ({
                 x: item.time,
@@ -70,37 +83,13 @@ export const CandleCharts = ({ data, suggestions }: Props) => {
             }))
         },
         {
-            name: 'EMA',
+            name: 'EMA12',
             type: 'line',
             data: data.map((item) => ({
                 x: item.time,
                 y: item.ema12,
             }))
-        },
-        {
-            name: 'Buy',
-            type: 'bar',
-            data: data.map((item) => {
-                const suggestion = suggestions.find((sug) => sug.buyTime.getTime() === item.time.getTime());
-                return {
-                    x: item.time,
-                    y: suggestion ? suggestion.buy : null,
-                    columnWidthOffset: 3
-                }
-            })
-        },
-        {
-            name: 'Sell',
-            type: 'bar',
-            data: data.map((item) => {
-                const suggestion = suggestions.find((sug) => sug.sellTime?.getTime() === item.time.getTime());
-                return {
-                    x: item.time,
-                    y: suggestion?.sell ? suggestion.sell : null,
-                    columnWidthOffset: 5
-                }
-            })
-        }]
+        },]
     });
 
     const [stateMACD] = useState<ApexOptions>({
@@ -122,11 +111,21 @@ export const CandleCharts = ({ data, suggestions }: Props) => {
                 }))
             },
             {
-                name: 'Value',
+                name: 'Value+',
                 type: 'bar',
+                color: 'green',
                 data: data.map((item) => ({
                     x: item.time,
-                    y: item.signalValue,
+                    y: item.signalValue! > 0 ? item.signalValue : null,
+                }))
+            },
+            {
+                name: 'Value-',
+                type: 'bar',
+                color: 'red',
+                data: data.map((item) => ({
+                    x: item.time,
+                    y: item.signalValue! < 0 ? item.signalValue : null,
                 }))
             }]
     });
@@ -142,7 +141,7 @@ export const CandleCharts = ({ data, suggestions }: Props) => {
                 <ReactApexChart options={OPTIONS} series={state.series} type="candlestick" height={350} />
             </div>
             <div>
-                <ReactApexChart options={OPTIONS_MACD} series={stateMACD.series} type="line" height={350} />
+                <ReactApexChart options={OPTIONS_MACD} series={stateMACD.series} type="candlestick" height={350} />
             </div>
         </div>
     );

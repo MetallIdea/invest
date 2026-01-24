@@ -2,7 +2,7 @@ import { db } from "common/src/data/db";
 import { Candle, candles } from "common/src/entities/candles";
 import { shares } from "common/src/entities/shares";
 import { CandleParams, candlesParams } from "common/src/entities/candlesParams";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, gte } from "drizzle-orm";
 import {
   calcATR,
   calcAvgTR,
@@ -12,14 +12,17 @@ import {
   calcTR,
 } from "common/src/calculates/calcCandleParameters";
 
-export async function calculateCandleParameters() {
-  console.log("Start calculateCandleParameters");
-  console.time("End calculateCandleParameters");
+export async function calculateLast30CandleParameters() {
+  console.log("Start calculateLast30CandleParameters");
+  console.time("End calculateLast30CandleParameters");
 
   const k50 = calcKoeff(50);
   const k9 = calcKoeff(9);
   const k12 = calcKoeff(12);
   const k26 = calcKoeff(26);
+
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - 240);
 
   const allShares = await db
     .select()
@@ -31,10 +34,15 @@ export async function calculateCandleParameters() {
     const allCandles = await db
       .select()
       .from(candles)
-      .where(eq(candles.instrumentId, allShares[i].figi))
+      .where(
+        and(
+          eq(candles.instrumentId, allShares[i].figi),
+          gte(candles.time, startDate)
+        )
+      )
       .orderBy(candles.time);
 
-    let prevCandleParams = null;
+    let prevCandleParams = allCandles[199];
 
     for (let j = 200; j < allCandles.length; j++) {
       const candle = allCandles[j];
@@ -73,9 +81,10 @@ export async function calculateCandleParameters() {
           ? prevCandleParams?.ema12 - prevCandleParams.ema26
           : null;
 
-      newCandleParams.signal = newCandleParams.macd && prevCandleParams?.signal
-        ? calcEMA(newCandleParams.macd, prevCandleParams.signal, k9)
-        : newCandleParams.macd;
+      newCandleParams.signal =
+        newCandleParams.macd && prevCandleParams?.signal
+          ? calcEMA(newCandleParams.macd, prevCandleParams.signal, k9)
+          : newCandleParams.macd;
 
       newCandleParams.signalValue =
         newCandleParams?.macd && newCandleParams.signal
@@ -91,5 +100,5 @@ export async function calculateCandleParameters() {
     }
   }
 
-  console.timeEnd("End calculateCandleParameters");
+  console.timeEnd("End calculateLast30CandleParameters");
 }

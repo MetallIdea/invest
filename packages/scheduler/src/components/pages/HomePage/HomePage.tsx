@@ -13,7 +13,7 @@ export function HomePage({ jobs }: Props) {
         await initJobs();
     }
     const handleJobClick = (jobId: string) => async () => {
-        runJob(jobId);
+        runJobOnce(jobId);
     }
 
     return (

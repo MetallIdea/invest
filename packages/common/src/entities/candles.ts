@@ -45,6 +45,9 @@ export const candles = t.pgTable("invest_candles", {
     mode: "number",
   }),
   isComplete: t.boolean(),
+  sma27: t.numeric({
+    mode: "number",
+  }),
   sma50: t.numeric({
     mode: "number",
   }),

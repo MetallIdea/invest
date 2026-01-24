@@ -8,6 +8,8 @@ export const jobs = t.pgTable("jobs", {
   method: t.varchar().notNull(),
   lastRun: t.timestamp(),
   nextRun: t.timestamp(),
+  isEnabled: t.boolean(),
+  isRunning: t.boolean(),
 });
 
 export type Job = typeof jobs.$inferSelect;

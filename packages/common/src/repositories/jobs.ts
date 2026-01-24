@@ -21,17 +21,15 @@ export async function createJob(job: {
 
 export async function updateJob(
   id: string,
-  job: {
-    name?: string;
-    schedule?: string;
-    method?: string;
-    lastRun?: Date | null;
-    nextRun?: Date | null;
-  }
+  job: Partial<Job>
 ) {
   return await db.update(jobs).set(job).where(eq(jobs.id, id));
 }
 
 export async function deleteJob(id: string) {
   await db.delete(jobs).where(eq(jobs.id, id));
+}
+
+export async function deleteAllJobsYesIWant() {
+  await db.delete(jobs);
 }

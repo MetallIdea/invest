@@ -13,3 +13,9 @@ export function calcCandle({
 export function calcPercent(start: number, end: number) {
   return (end * 100) / start - 100;
 }
+
+export function round(x: number, count: number) {
+  const count10 = Math.pow(10, count);
+
+  return Math.floor(x * count10) / count10;
+}
