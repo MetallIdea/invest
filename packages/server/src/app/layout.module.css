@@ -1,6 +1,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  --bottomNavHeigth: 50px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,6 +24,10 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body.isMobile {
+  padding-bottom: var(--bottomNavHeigth);
 }
 
 :global(*) {

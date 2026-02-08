@@ -1,8 +1,7 @@
 import { db } from "common/src/data/db";
 import { Candle, candles } from "common/src/entities/candles";
 import { shares } from "common/src/entities/shares";
-import { CandleParams, candlesParams } from "common/src/entities/candlesParams";
-import { and, desc, eq, gte } from "drizzle-orm";
+import { and, eq, gte } from "drizzle-orm";
 import {
   calcATR,
   calcAvgTR,
@@ -42,7 +41,7 @@ export async function calculateLast30CandleParameters() {
       )
       .orderBy(candles.time);
 
-    let prevCandleParams = allCandles[199];
+    let prevCandleParams: Partial<Candle> = allCandles[199];
 
     for (let j = 200; j < allCandles.length; j++) {
       const candle = allCandles[j];

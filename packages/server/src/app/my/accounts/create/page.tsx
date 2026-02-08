@@ -1,8 +1,6 @@
 import styles from './page.module.css';
 import { db } from "common/src/data/db"
-import { and, eq } from "drizzle-orm"
-import { getUser, setUser } from "@/utils/user"
-import { Button, Input } from "antd"
+import { getUser } from "common/src/utils/user";
 import { accounts } from 'common/src/entities/accounts';
 
 export default function Login() {
@@ -10,21 +8,24 @@ export default function Login() {
         'use server'
         const user = await getUser();
 
+        if (!user) {
+            throw new Error('Не залогинены')
+        }
+
         const userData = {
-            name: formData.get('name') ?? '',
+            name: formData.get('name')?.toString() ?? '',
         }
 
         await db.insert(accounts).values({
-            eq(accounts.name, userData.name.toString()),
-            eq(accounts.userId, user.id)
-    });
-}
+            accountId: '1',
+            name: userData.name,
+            userId: user.id,
+            money: 0,
+        });
+    }
 
-return <div className={styles.root}>
-    <form className={styles.form} action={createInvoice}>
-        <Input name={'login'} placeholder={'Логин'} type={'text'} />
-        <Input name={'password'} placeholder="Пароль" type={'password'} />
-        <Button type="primary" htmlType={'submit'}>Submit</Button>
-    </form>
-</div>
+    return <div className={styles.root}>
+        <form className={styles.form} action={createInvoice}>
+        </form>
+    </div>
 }

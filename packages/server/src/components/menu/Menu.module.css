@@ -1,4 +1,19 @@
 .root {
-    position: sticky;
+    position: fixed;
+    left: 0;
+    right: 0;
     bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    background-color: bisque;
+}
+
+.item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: var(--bottomNavHeigth);
+    width: 25%;
+    border: 1px solid gray;
+    padding: 8px;
 }

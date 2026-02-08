@@ -5,8 +5,9 @@ import { shares } from 'common/src/entities/shares';
 import { db } from "common/src/data/db";
 import { HomePage } from "@/modules/HomePage/HomePage";
 import { HomeContextProvider } from "@/modules/HomePage/HomeContext";
+import { candles } from "common/src/entities/candles";
 
-export default async function Home() {
+const getInitialData = async () => {
   const date = new Date();
 
   if (date.getDay() === 6 || date.getDay() === 0) {
@@ -24,12 +25,25 @@ export default async function Home() {
     .innerJoin(shares, eq(shares.id, suggestions.instrumentId))
     .orderBy(desc(suggestions.buyTime));
 
+  const allSharesWithLastCandles = await db.select().from(shares)
+    .innerJoin(candles, eq(shares.figi, candles.instrumentId))
+    .where(gt(candles.diff, 0))
+    .orderBy(desc(candles.time), desc(candles.diff))
+    .limit(100);
+
+  return {
+    lastSuggestions,
+    allSuggestions,
+    allSharesWithLastCandles,
+  }
+}
+
+export default async function Home() {
+  const initialData = await getInitialData();
+
   return (
     <div className={styles.page}>
-      <HomeContextProvider value={{
-        lastSuggestions,
-        allSuggestions,
-      }}>
+      <HomeContextProvider value={initialData}>
         <HomePage />
       </HomeContextProvider>
     </div>

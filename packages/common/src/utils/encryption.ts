@@ -24,3 +24,7 @@ export function decrypt(ivCiphertextB64: string) {
   const decrypted = Buffer.concat([cipher.update(ciphertext), cipher.final()]);
   return decrypted.toString("utf-8");
 }
+
+export function encryptMD5(input: string) {
+  return crypto.createHash('md5').update(input).digest('hex');
+}

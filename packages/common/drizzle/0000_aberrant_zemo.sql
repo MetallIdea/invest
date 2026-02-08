@@ -26,7 +26,15 @@ CREATE TABLE "invest_candles" (
 	"diff_high" numeric NOT NULL,
 	"volume" numeric,
 	"is_complete" boolean,
+	"sma27" numeric,
+	"sma50" numeric,
 	"sma200" numeric,
+	"macd" numeric,
+	"signal" numeric,
+	"signal_value" numeric,
+	"ema9" numeric,
+	"ema12" numeric,
+	"ema26" numeric,
 	"ema50" numeric,
 	"tr" numeric,
 	"atr14" numeric
@@ -37,11 +45,20 @@ CREATE TABLE "invest_candles_params" (
 	"updated_at" timestamp,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"deleted_at" timestamp,
+	"name" varchar,
+	"description" varchar,
+	"order" varchar,
+	"calculate" varchar
+);
+--> statement-breakpoint
+CREATE TABLE "invest_candles_params_values" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"updated_at" timestamp,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"deleted_at" timestamp,
 	"candle_id" uuid NOT NULL,
-	"sma200" numeric,
-	"ema50" numeric,
-	"tr" numeric,
-	"atr14" numeric
+	"param_id" uuid NOT NULL,
+	"value" numeric
 );
 --> statement-breakpoint
 CREATE TABLE "invest_deals" (
@@ -64,7 +81,9 @@ CREATE TABLE "jobs" (
 	"schedule" varchar NOT NULL,
 	"method" varchar NOT NULL,
 	"last_run" timestamp,
-	"next_run" timestamp
+	"next_run" timestamp,
+	"is_enabled" boolean,
+	"is_running" boolean
 );
 --> statement-breakpoint
 CREATE TABLE "invest_portfolio" (
@@ -110,6 +129,7 @@ CREATE TABLE "invest_suggestions" (
 	"buy_time" timestamp,
 	"sell_time" timestamp,
 	"max" numeric,
+	"false_positive" boolean DEFAULT false,
 	"strategy_id" uuid NOT NULL
 );
 --> statement-breakpoint
@@ -123,10 +143,9 @@ CREATE TABLE "users" (
 );
 --> statement-breakpoint
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "invest_candles_params" ADD CONSTRAINT "invest_candles_params_candle_id_invest_candles_id_fk" FOREIGN KEY ("candle_id") REFERENCES "public"."invest_candles"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "invest_candles_params_values" ADD CONSTRAINT "invest_candles_params_values_candle_id_invest_candles_id_fk" FOREIGN KEY ("candle_id") REFERENCES "public"."invest_candles"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "invest_candles_params_values" ADD CONSTRAINT "invest_candles_params_values_param_id_invest_candles_params_id_fk" FOREIGN KEY ("param_id") REFERENCES "public"."invest_candles_params"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "invest_deals" ADD CONSTRAINT "invest_deals_share_id_invest_shares_id_fk" FOREIGN KEY ("share_id") REFERENCES "public"."invest_shares"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "invest_portfolio" ADD CONSTRAINT "invest_portfolio_share_id_invest_shares_id_fk" FOREIGN KEY ("share_id") REFERENCES "public"."invest_shares"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "invest_suggestions" ADD CONSTRAINT "invest_suggestions_instrument_id_invest_shares_id_fk" FOREIGN KEY ("instrument_id") REFERENCES "public"."invest_shares"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "invest_suggestions" ADD CONSTRAINT "invest_suggestions_strategy_id_invest_strategies_id_fk" FOREIGN KEY ("strategy_id") REFERENCES "public"."invest_strategies"("id") ON DELETE cascade ON UPDATE no action;
-
-INSERT INTO "users" ("login", "password") VALUES ("admin", "test!@#$")

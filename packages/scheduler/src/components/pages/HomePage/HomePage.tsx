@@ -1,6 +1,6 @@
 'use client';
 
-import { initJobs, runJob } from '@/jobs/methods';
+import { initJobs, runJobOnce } from '@/jobs/methods';
 import { Button, Input } from 'antd';
 import { Job } from 'common/src/entities/jobs';
 

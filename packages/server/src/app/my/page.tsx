@@ -3,8 +3,7 @@ import styles from "./page.module.css";
 import { db } from "common/src/data/db";
 import { accounts } from "common/src/entities/accounts";
 import { eq } from "drizzle-orm";
-import { getUser } from "@/utils/user";
-import { NextResponse } from "next/server";
+import { getUser } from "common/src/utils/user";
 import Link from "next/link";
 
 export default async function MyPage() {

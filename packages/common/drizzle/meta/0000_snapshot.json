@@ -1,5 +1,5 @@
 {
-  "id": "b8f3cd3b-1c02-4a16-b2f8-571abb00b4c5",
+  "id": "ca34c09d-5c7a-4f33-8c67-2ea8e114f903",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -183,8 +183,56 @@
           "primaryKey": false,
           "notNull": false
         },
+        "sma27": {
+          "name": "sma27",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sma50": {
+          "name": "sma50",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
         "sma200": {
           "name": "sma200",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "macd": {
+          "name": "macd",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "signal": {
+          "name": "signal",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "signal_value": {
+          "name": "signal_value",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ema9": {
+          "name": "ema9",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ema12": {
+          "name": "ema12",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ema26": {
+          "name": "ema26",
           "type": "numeric",
           "primaryKey": false,
           "notNull": false
@@ -246,32 +294,83 @@
           "primaryKey": false,
           "notNull": false
         },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "order": {
+          "name": "order",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "calculate": {
+          "name": "calculate",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.invest_candles_params_values": {
+      "name": "invest_candles_params_values",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
         "candle_id": {
           "name": "candle_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "sma200": {
-          "name": "sma200",
-          "type": "numeric",
+        "param_id": {
+          "name": "param_id",
+          "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "ema50": {
-          "name": "ema50",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "tr": {
-          "name": "tr",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "atr14": {
-          "name": "atr14",
+        "value": {
+          "name": "value",
           "type": "numeric",
           "primaryKey": false,
           "notNull": false
@@ -279,12 +378,25 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "invest_candles_params_candle_id_invest_candles_id_fk": {
-          "name": "invest_candles_params_candle_id_invest_candles_id_fk",
-          "tableFrom": "invest_candles_params",
+        "invest_candles_params_values_candle_id_invest_candles_id_fk": {
+          "name": "invest_candles_params_values_candle_id_invest_candles_id_fk",
+          "tableFrom": "invest_candles_params_values",
           "tableTo": "invest_candles",
           "columnsFrom": [
             "candle_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "invest_candles_params_values_param_id_invest_candles_params_id_fk": {
+          "name": "invest_candles_params_values_param_id_invest_candles_params_id_fk",
+          "tableFrom": "invest_candles_params_values",
+          "tableTo": "invest_candles_params",
+          "columnsFrom": [
+            "param_id"
           ],
           "columnsTo": [
             "id"
@@ -433,6 +545,18 @@
         "next_run": {
           "name": "next_run",
           "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_enabled": {
+          "name": "is_enabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_running": {
+          "name": "is_running",
+          "type": "boolean",
           "primaryKey": false,
           "notNull": false
         }
@@ -707,6 +831,13 @@
           "type": "numeric",
           "primaryKey": false,
           "notNull": false
+        },
+        "false_positive": {
+          "name": "false_positive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
         },
         "strategy_id": {
           "name": "strategy_id",

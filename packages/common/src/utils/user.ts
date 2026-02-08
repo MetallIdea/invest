@@ -1,6 +1,6 @@
 import { decrypt, encrypt } from "./encryption";
 import { users } from "common/src/entities/users";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 
 export async function getUser(): Promise<typeof users.$inferSelect | null> {
   const cookieStore = await cookies();
@@ -21,10 +21,20 @@ export async function setUser(user: typeof users.$inferSelect) {
     value: encrypt(
       JSON.stringify({
         id: user.id,
-      })
+      }),
     ),
     httpOnly: true,
     path: "/",
     expires: expires.getTime(),
   });
+}
+
+export async function getDevice() {
+  const headersValues = await headers();
+  const userAgent = headersValues.get("user-agent") ?? "";
+  const isMobile = /Mobi|Android|iPhone/i.test(userAgent);
+
+  return {
+    isMobile,
+  };
 }
