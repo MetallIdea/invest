@@ -4,27 +4,37 @@ import { useNotificationsSW } from "@/hooks/useNotificationsSW";
 import { dateFormat } from "common/src/utils/time";
 import { useHomeContext } from "./HomeContext";
 import { BaseCard } from "@/components/cards/BaseCard";
-import { ChangeEventHandler, useState } from "react";
-import { Input } from "antd";
+import { useCallback, useRef, useState } from "react";
+import { SharesFilter } from "@/components/SharesFilter/SharesFilter";
 
 export const HomePage = () => {
     const { allSharesWithLastCandles, lastSuggestions, allSuggestions } = useHomeContext();
 
-    const [search, setSearch] = useState('');
+    const [filters, setFilters] = useState({ search: '', minProfit: '' });
+
     const [isShowLastGrowth, setIsShowLastGrowth] = useState(true);
+    const intersectedItems = useRef<Record<string, string>>({});
 
     useNotificationsSW();
-
-    const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
-        setSearch(e.target.value);
-    };
 
     const toggleLastGrowth = () => {
         setIsShowLastGrowth(state => !state);
     }
 
+    const handleIntersection = useCallback((id: string) => () => {
+        if (!intersectedItems.current[id]) {
+            intersectedItems.current[id] = 'pending';
+            console.log(id);
+        }
+    }, [intersectedItems]);
+
+    const filterFunction = ({ invest_shares: share, invest_candles: candle }: any) => {
+        return share.name?.includes(filters.search) &&
+            (!filters.minProfit || candle.diff > Number(filters.minProfit))
+    }
+
     return <div>
-        <Input value={search} onChange={handleChange} />
+        <SharesFilter onSubmit={setFilters} />
         <div>
             <div onClick={toggleLastGrowth}>
                 Последний рост
@@ -34,7 +44,7 @@ export const HomePage = () => {
                     <div
                         className={styles.items}>
                         {
-                            allSharesWithLastCandles.filter(({ invest_shares: share }) => share.name?.includes(search)).map(({ invest_shares: share, invest_candles: candle }) => (
+                            allSharesWithLastCandles.filter(filterFunction).map(({ invest_shares: share, invest_candles: candle }) => (
                                 <BaseCard
                                     key={candle.id}
                                     className={styles.item}
@@ -53,6 +63,7 @@ export const HomePage = () => {
                                             value: candle.diff
                                         }
                                     ]}
+                                    onIntersection={handleIntersection(share.id)}
                                 />
                             ))
                         }
@@ -67,7 +78,7 @@ export const HomePage = () => {
             <div
                 className={styles.items}>
                 {
-                    lastSuggestions.filter(({ invest_shares: share }) => share.name?.includes(search)).map(({ invest_shares: share, invest_suggestions: suggestion }) => (
+                    lastSuggestions.filter(({ invest_shares: share }) => share.name?.includes(filters.search)).map(({ invest_shares: share, invest_suggestions: suggestion }) => (
                         <BaseCard
                             key={suggestion.id}
                             className={styles.item}
@@ -97,7 +108,7 @@ export const HomePage = () => {
             <div
                 className={styles.items}>
                 {
-                    allSuggestions.filter(({ invest_shares: share }) => share.name?.includes(search)).map(({ invest_shares: share, invest_suggestions: suggestion }) => (
+                    allSuggestions.filter(({ invest_shares: share }) => share.name?.includes(filters.search)).map(({ invest_shares: share, invest_suggestions: suggestion }) => (
                         <BaseCard
                             key={suggestion.id}
                             className={styles.item}

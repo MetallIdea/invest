@@ -42,7 +42,7 @@ export async function initJobs() {
         await updateJob(job.id, {
           isRunning: false,
         });
-      }
+      },
     );
 
     await updateJob(job.id, {
@@ -59,14 +59,22 @@ export async function initJobs() {
 export async function runJobOnce(jobId: string) {
   const job = await getJobById(jobId);
 
+  await updateJob(jobId, {
+    isRunning: true,
+  });
+
   await JOB_DEFINITIONS[job.method]();
+
+  await updateJob(jobId, {
+    isRunning: false,
+  });
 }
 
 export async function stopJob(jobId: string) {
   const job = await getJobById(jobId);
 
   const scheduleJob = runningJobs.find(
-    (runningJob) => runningJob.name === job.id
+    (runningJob) => runningJob.name === job.id,
   );
 
   await scheduleJob?.cancel();
@@ -78,7 +86,7 @@ export async function stopJob(jobId: string) {
 
 export async function runJob(jobId: string) {
   const scheduleJob = runningJobs.find(
-    (runningJob) => runningJob.name === jobId
+    (runningJob) => runningJob.name === jobId,
   );
 
   if (scheduleJob) {
@@ -88,4 +96,10 @@ export async function runJob(jobId: string) {
       isEnabled: true,
     });
   }
+}
+
+export async function getJobsStatus() {
+  const jobs = await getAllJobs();
+
+  return jobs;
 }

@@ -19,10 +19,7 @@ export async function createJob(job: {
   return await db.insert(jobs).values(job);
 }
 
-export async function updateJob(
-  id: string,
-  job: Partial<Job>
-) {
+export async function updateJob(id: string, job: Partial<Job>) {
   return await db.update(jobs).set(job).where(eq(jobs.id, id));
 }
 

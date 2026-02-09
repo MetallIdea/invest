@@ -1,0 +1,12 @@
+.job {
+    border: 1px solid #dcdcdc;
+    padding: 8px;
+}
+
+.enabled {
+    border-color: #2ec63b;
+}
+
+.isRunning {
+    background-color: #2ec63b;
+}

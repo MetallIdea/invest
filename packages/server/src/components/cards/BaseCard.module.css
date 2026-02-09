@@ -1,6 +1,7 @@
 .root {
-    background-color: 1px solid #0f5bbe;
+    background-color: #afafaf;
     border-radius: 4px;
+    border: 1px solid gray
 }
 
 .title {

@@ -5,6 +5,7 @@
   "scripts": {
     "start": "tsx main.ts",
     "generate": "npx drizzle-kit generate",
+    "generate:empty": "npx drizzle-kit generate --custom",
     "migrate": "npx drizzle-kit migrate",
     "update": "npx drizzle-kit push",
     "lint": "eslint"
