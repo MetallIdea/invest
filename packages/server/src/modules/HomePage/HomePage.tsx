@@ -28,7 +28,7 @@ export const HomePage = () => {
         }
     }, [intersectedItems]);
 
-    const filterFunction = ({ invest_shares: share, invest_candles: candle }: any) => {
+    const filterFunction = ({ invest_shares: share, invest_candles: candle }: typeof allSharesWithLastCandles[0]) => {
         return share.name?.includes(filters.search) &&
             (!filters.minProfit || candle.diff > Number(filters.minProfit))
     }
@@ -95,7 +95,7 @@ export const HomePage = () => {
                                 },
                                 {
                                     label: suggestion.sellTime ? dateFormat(suggestion.sellTime) : null,
-                                    value: <div className={suggestion.sell > 0 ? styles.green : styles.red}>{suggestion.sell}</div>
+                                    value: <div className={suggestion.sell && suggestion.sell > 0 ? styles.green : styles.red}>{suggestion.sell}</div>
                                 }
                             ]}
                         />

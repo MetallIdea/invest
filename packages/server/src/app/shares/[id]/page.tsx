@@ -2,10 +2,8 @@ import { db } from "common/src/data/db";
 import styles from "./page.module.css";
 import { shares } from "common/src/entities/shares";
 import { candles } from "common/src/entities/candles";
-import { candlesParams } from "common/src/entities/candlesParams";
 import { and, desc, eq, gte } from "drizzle-orm";
 import cn from "classnames";
-import { calcBuy, calcSell } from 'common/src/calculates/calcSuggestions';
 import { CandleCharts } from "@/components/charts/CandleCharts";
 import { suggestions } from "common/src/entities/suggestions";
 
@@ -36,7 +34,7 @@ export default async function Share({ params }: {
                 <CandleCharts data={allCandles} suggestions={shareSuggestions} />
             </div>
             <div>
-                {allCandles.map((candle, index) => (
+                {allCandles.map((candle) => (
                     <div key={candle.id} className={cn(styles.candle, {
                         [styles.green]: candle.diff > 0,
                         [styles.red]: candle.diff < 0

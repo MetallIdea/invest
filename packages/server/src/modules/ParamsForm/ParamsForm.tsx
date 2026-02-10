@@ -3,7 +3,7 @@
 import { Button, Input } from "antd";
 import { CandleParams } from "common/src/entities/candlesParams";
 import { submitForm } from './actions';
-import { Form, useFormik } from "formik";
+import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
 
 type Props = {

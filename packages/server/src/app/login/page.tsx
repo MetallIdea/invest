@@ -4,6 +4,7 @@ import { users } from "common/src/entities/users"
 import { and, eq } from "drizzle-orm"
 import { setUser } from "common/src/utils/user"
 import { Button, Input } from "antd"
+import { encryptMD5 } from 'common/src/utils/encryption';
 
 export default function Login() {
     async function createInvoice(formData: FormData) {
@@ -16,7 +17,7 @@ export default function Login() {
         const [user] = await db.select().from(users).where(
             and(
                 eq(users.login, userData.login.toString()),
-                eq(users.password, userData.password.toString())
+                eq(users.password, encryptMD5(userData.password.toString()))
             )
         );
 

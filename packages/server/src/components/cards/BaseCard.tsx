@@ -1,8 +1,7 @@
-import { ReactNode, useRef } from "react";
+import { ReactNode } from "react";
 
 import styles from './BaseCard.module.css';
 import cn from "classnames";
-import { useIntersection } from "@/hooks/useIntersection";
 
 type Props = {
     className?: string;
@@ -15,13 +14,9 @@ type Props = {
     }[]
 }
 
-export const BaseCard = ({ className, title, rightTitle, onIntersection, items }: Props) => {
-    const ref = useRef<HTMLDivElement>(null);
-
-    useIntersection(ref, onIntersection);
-
+export const BaseCard = ({ className, title, rightTitle, items }: Props) => {
     return (
-        <div className={cn(styles.root, className)} ref={ref}>
+        <div className={cn(styles.root, className)}>
             <div className={styles.title}>
                 {title}
                 {rightTitle ? <div>{rightTitle}</div> : null}

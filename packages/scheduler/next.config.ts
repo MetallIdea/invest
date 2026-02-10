@@ -6,6 +6,7 @@ const nextConfig: NextConfig & {
   };
 } = {
   /* config options here */
+  basePath: process.env.BASE_PATH,
   experimental: {
     instrumentationHook: true,
   },

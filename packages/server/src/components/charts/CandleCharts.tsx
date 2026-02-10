@@ -4,16 +4,6 @@ import { ApexOptions } from "apexcharts";
 import { useState } from "react";
 import { Candle } from "common/src/entities/candles";
 
-type Props = {
-    data: Candle[];
-    suggestions: {
-        buy: number;
-        sell: number;
-        buyTime: Date;
-        sellTime: Date;
-    }[]
-}
-
 const OPTIONS: ApexOptions = {
     chart: {
         type: 'candlestick',
@@ -51,6 +41,16 @@ const OPTIONS_MACD: ApexOptions = {
     }],
 };
 
+type Props = {
+    data: Candle[];
+    suggestions: {
+        buy: number | null;
+        sell: number | null;
+        buyTime: Date | null;
+        sellTime: Date | null;
+    }[]
+}
+
 export const CandleCharts = ({ data, suggestions }: Props) => {
     const [state] = useState<ApexOptions>({
         series: [{
@@ -59,7 +59,7 @@ export const CandleCharts = ({ data, suggestions }: Props) => {
                 x: item.time,
                 y: [item.open, item.high, item.low, item.close],
                 fillColor: (() => {
-                    const suggestionBuy = suggestions.find((sug) => sug.buyTime.getTime() === item.time.getTime());
+                    const suggestionBuy = suggestions.find((sug) => sug.buyTime?.getTime() === item.time.getTime());
                     const suggestionSell = suggestions.find((sug) => (sug.sellTime && sug.sellTime.getTime() === item.time.getTime()));
 
                     if (suggestionSell?.sell) {

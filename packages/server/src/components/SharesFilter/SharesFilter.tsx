@@ -1,8 +1,13 @@
 import { Button, Input, Space } from "antd";
 import { useFormik } from "formik"
 
+type Values = {
+    search: string;
+    minProfit: string;
+}
+
 type Props = {
-    onSubmit: (value: any) => void
+    onSubmit: (value: Values) => void
 }
 
 export function SharesFilter({ onSubmit }: Props) {

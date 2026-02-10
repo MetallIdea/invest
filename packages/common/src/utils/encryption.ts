@@ -1,9 +1,10 @@
-import crypto from "node:crypto";
+import * as crypto from "crypto";
 
-const key = Buffer.from(
-  "MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE=",
-  "base64"
-);
+const saltCookie = process.env.SALT_COOKIES!;
+
+const salt = process.env.SALT!;
+
+const key = Buffer.from(saltCookie, "base64");
 
 export function encrypt(plaintext: string) {
   const iv = crypto.randomBytes(16);
@@ -26,5 +27,8 @@ export function decrypt(ivCiphertextB64: string) {
 }
 
 export function encryptMD5(input: string) {
-  return crypto.createHash('md5').update(input).digest('hex');
+  return crypto
+    .createHash("md5")
+    .update(input + salt)
+    .digest("hex");
 }

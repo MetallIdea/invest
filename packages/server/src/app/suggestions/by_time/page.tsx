@@ -4,7 +4,7 @@ import { shares } from 'common/src/entities/shares';
 import { db } from "common/src/data/db";
 
 import styles from './page.module.css';
-import { dateFormat } from "@/utils/time";
+import { dateFormat } from "common/src/utils/time";
 import { BaseCard } from "@/components/cards/BaseCard";
 
 export default async function SuggestionsByTime() {
