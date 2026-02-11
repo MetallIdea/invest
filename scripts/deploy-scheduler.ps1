@@ -1,4 +1,4 @@
-plink -ssh root@194.87.46.227 -P 8988 -batch "rm -f -r /www/wwwroot/alcoinvest.ru/packages/scheduler/.next/server /www/wwwroot/alcoinvest.ru/packages/scheduler/.next/static /www/wwwroot/alcoinvest.ru/packages/scheduler/package.json"
+plink -ssh root@194.87.46.227 -P 8988 -batch "rm -f -r /www/wwwroot/alcoinvest.ru/packages/scheduler/.next/* /www/wwwroot/alcoinvest.ru/packages/scheduler/package.json"
 pscp -r ./packages/scheduler/.next/server root@194.87.46.227:/www/wwwroot/alcoinvest.ru/packages/scheduler/.next/
 pscp -r ./packages/scheduler/.next/static root@194.87.46.227:/www/wwwroot/alcoinvest.ru/packages/scheduler/.next/
 pscp -r ./packages/scheduler/.next/node_modules root@194.87.46.227:/www/wwwroot/alcoinvest.ru/packages/scheduler/.next/
