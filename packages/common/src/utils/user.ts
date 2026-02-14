@@ -21,6 +21,7 @@ export async function setUser(user: typeof users.$inferSelect) {
     value: encrypt(
       JSON.stringify({
         id: user.id,
+        login: user.login,
       }),
     ),
     httpOnly: true,

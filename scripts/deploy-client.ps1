@@ -5,5 +5,6 @@ pscp -r ./packages/server/public root@194.87.46.227:/www/wwwroot/alcoinvest.ru/p
 pscp -r ./packages/server/.next/node_modules root@194.87.46.227:/www/wwwroot/alcoinvest.ru/packages/server/.next/
 pscp -r ./packages/server/.next/*.json root@194.87.46.227:/www/wwwroot/alcoinvest.ru/packages/server/.next/
 pscp -r ./packages/server/.next/BUILD_ID root@194.87.46.227:/www/wwwroot/alcoinvest.ru/packages/server/.next/
+pscp -r ./packages/scheduler/next.config.js root@194.87.46.227:/www/wwwroot/alcoinvest.ru/packages/scheduler/
 pscp -r ./packages/server/package.json root@194.87.46.227:/www/wwwroot/alcoinvest.ru/packages/server/
 plink -ssh root@194.87.46.227 -P 8988 -batch "cd /www/wwwroot/alcoinvest.ru; npm i --omit=dev"

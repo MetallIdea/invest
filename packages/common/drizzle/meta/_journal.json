@@ -15,6 +15,13 @@
       "when": 1770574239582,
       "tag": "0001_woozy_sabra",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1770829685344,
+      "tag": "0002_chunky_dreadnoughts",
+      "breakpoints": true
     }
   ]
 }

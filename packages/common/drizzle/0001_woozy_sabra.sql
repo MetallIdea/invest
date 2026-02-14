@@ -6,10 +6,3 @@ INSERT INTO "jobs" ("name", "schedule", "method", "is_enabled") VALUES
 ('Рассчитать свечи', '0 5 * * *', 'calculateSuggestions', 1),
 ('Вычислить параметры', '30 4 * * *', 'calculateCandleParameters', 1),
 ('Получить все свечи', '0 4 1 * *', 'fetchOldCandles', 1)
-
--- Change password in PROD AND REMOVE SELECT --
-SELECT
-INSERT INTO "users" (
-	"login",
-	"password"
-) VALUES ('super-admin', 'd7b27f2e6e22a6424ec0e51bad079708')

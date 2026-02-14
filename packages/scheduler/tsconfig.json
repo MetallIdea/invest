@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "../common/shares/shares.ts", "../common/data/baseEntity.ts", "../common/data/db.ts"  ],
+, "../common/shares/shares.ts", "../common/data/baseEntity.ts", "../common/data/db.ts", "next.config.js"  ],
   "exclude": ["node_modules"]
 }

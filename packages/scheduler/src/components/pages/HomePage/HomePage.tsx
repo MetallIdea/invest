@@ -3,10 +3,12 @@
 import styles from './HomePage.module.css';
 
 import { getJobsStatus, initJobs, runJobOnce } from '@/jobs/methods';
-import { Button, Input, Space } from 'antd';
+import { Button, Checkbox, Input, Space } from 'antd';
 import cn from 'classnames';
 import { Job } from 'common/src/entities/jobs';
+import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
+import { saveJobs } from './actions';
 
 type Props = {
     jobs: Job[];
@@ -14,6 +16,17 @@ type Props = {
 
 export function HomePage({ jobs: initialJobs }: Props) {
     const [jobs, setJobs] = useState(initialJobs);
+
+    const { values, handleChange, handleSubmit } = useFormik({
+        initialValues: {
+            jobs: initialJobs,
+        },
+        onSubmit: async (values) => {
+            console.log(values);
+            await saveJobs(values.jobs);
+        }
+    });
+
     async function handleClick() {
         await initJobs();
     }
@@ -40,24 +53,30 @@ export function HomePage({ jobs: initialJobs }: Props) {
 
     return (
         <div>
-            <Space vertical={true}>
-                {jobs.map((job) => (
-                    <div key={job.name} className={cn(styles.job, {
-                        [styles.enabled]: job.isEnabled,
-                        [styles.isRunning]: job.isRunning,
-                    })}>
-                        <div>{job.name}</div>
-                        <div><Input name='schedule' value={job.schedule} /></div>
-                        <div>{job.method}</div>
-                        <div>{job.lastRun?.toISOString()}</div>
-                        <div>{job.nextRun?.toISOString()}</div>
-                        <Button onClick={handleJobClick(job.id)}>Запустить раз</Button>
-                    </div>
-                ))}
-            </Space>
-            <div>
-                <Button onClick={handleClick}>Запустить</Button>
-            </div>
+            <form onSubmit={handleSubmit}>
+                <Space vertical={true}>
+                    {jobs.map((job, index) => (
+                        <div key={job.name} className={cn(styles.job, {
+                            [styles.enabled]: job.isEnabled,
+                            [styles.isRunning]: job.isRunning,
+                        })}>
+                            <div>{job.name}</div>
+                            <div><Input name={`jobs[${index}].schedule`} value={values.jobs[index].schedule} onChange={handleChange} /></div>
+                            <div>{job.method}</div>
+                            <div>{job.lastRun?.toISOString()}</div>
+                            <div>{job.nextRun?.toISOString()}</div>
+                            <Checkbox name={`jobs[${index}].isEnabled`} checked={values.jobs[index].isEnabled ?? undefined} onChange={handleChange} />
+                            <Space>
+                                <Button onClick={handleJobClick(job.id)}>Запустить раз</Button>
+                                <Button htmlType="submit">Сохранить</Button>
+                            </Space>
+                        </div>
+                    ))}
+                </Space>
+                <div>
+                    <Button onClick={handleClick}>Запустить</Button>
+                </div>
+            </form>
         </div>
     )
 

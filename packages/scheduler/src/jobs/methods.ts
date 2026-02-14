@@ -6,22 +6,7 @@ import {
   getJobById,
   updateJob,
 } from "common/src/repositories/jobs";
-import { fetchActualShares } from "./fetchActualShares";
-import { fetchLastCandles } from "./fetchLastCandles";
-import { calculateSuggestions } from "./calculateSuggestions";
-import { runningJobs } from "./runningJobs";
-import { calculateCandleParameters } from "./calculateCandleParameters";
-import { fetchOldCandles } from "./fetchOldCandles";
-import { calculateLast30CandleParameters } from "./calculateLast30CandleParameters";
-
-const JOB_DEFINITIONS: Record<string, () => void> = {
-  fetchActualShares: fetchActualShares,
-  fetchLastCandles: fetchLastCandles,
-  fetchOldCandles: fetchOldCandles,
-  calculateCandleParameters: calculateCandleParameters,
-  calculateLast30CandleParameters: calculateLast30CandleParameters,
-  calculateSuggestions: calculateSuggestions,
-};
+import { JOB_DEFINITIONS, runningJobs } from "./runningJobs";
 
 export async function initJobs() {
   console.log("Запуск всех заданий");
@@ -80,19 +65,27 @@ export async function stopJob(jobId: string) {
   await scheduleJob?.cancel();
 
   await updateJob(job.id, {
+    nextRun: null,
     isEnabled: false,
   });
 }
 
-export async function runJob(jobId: string) {
+export async function runJob({
+  jobId,
+  schedule,
+}: {
+  jobId: string;
+  schedule: string;
+}) {
   const scheduleJob = runningJobs.find(
     (runningJob) => runningJob.name === jobId,
   );
 
   if (scheduleJob) {
-    await scheduleJob.cancel(true);
+    await scheduleJob.reschedule(schedule);
 
     await updateJob(jobId, {
+      nextRun: scheduleJob.nextInvocation(),
       isEnabled: true,
     });
   }
