@@ -26,7 +26,7 @@ export async function calculateLastSuggestions() {
     const allCandles = await db
       .select()
       .from(candles)
-      .where(eq(candles.instrumentId, allShares[i].figi))
+      .where(eq(candles.shareId, allShares[i].id))
       .orderBy(candles.time);
 
     for (let j = 0; j < allCandles.length; j++) {
@@ -35,15 +35,17 @@ export async function calculateLastSuggestions() {
       if (calcBuy(allCandles, j)) {
         await db
           .insert(suggestions)
-          .values({
-          instrumentId: allShares[i].id,
-          strategyId: strategy.id,
-          buy: candle.close,
-          buyTime: candle.time,
-          sell: null,
-          sellTime: null,
-          max: candle.close,
-        }!)
+          .values(
+            {
+              instrumentId: allShares[i].id,
+              strategyId: strategy.id,
+              buy: candle.close,
+              buyTime: candle.time,
+              sell: null,
+              sellTime: null,
+              max: candle.close,
+            }!,
+          )
           .returning({
             id: suggestions.id,
           });

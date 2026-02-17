@@ -1,7 +1,7 @@
 import { db } from "common/src/data/db";
 import { eq } from "drizzle-orm";
 import { candlesParams } from "common/src/entities/candlesParams";
-import { ParamsForm } from "@/modules/ParamsForm/ParamsForm";
+import { ParamsForm } from "@/app-pages/ParamsForm/ParamsForm";
 
 export default async function ParamsFormPage({ params }: {
     params: Promise<{ id: string }>

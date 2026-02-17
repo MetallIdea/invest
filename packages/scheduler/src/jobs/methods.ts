@@ -22,7 +22,9 @@ export async function initJobs() {
           nextRun: runningJob.nextInvocation(),
           isRunning: true,
         });
-        await JOB_DEFINITIONS[job.method]();
+        try {
+          await JOB_DEFINITIONS[job.method]();
+        } catch {}
 
         await updateJob(job.id, {
           isRunning: false,
@@ -45,10 +47,15 @@ export async function runJobOnce(jobId: string) {
   const job = await getJobById(jobId);
 
   await updateJob(jobId, {
+    lastRun: new Date(),
     isRunning: true,
   });
 
-  await JOB_DEFINITIONS[job.method]();
+  try {
+    await JOB_DEFINITIONS[job.method]();
+  } catch (e) {
+    console.log(e);
+  }
 
   await updateJob(jobId, {
     isRunning: false,

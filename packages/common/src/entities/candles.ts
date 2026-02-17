@@ -1,9 +1,15 @@
 import * as t from "drizzle-orm/pg-core";
 import { baseEntity } from "../data/baseEntity";
+import { relations } from "drizzle-orm";
+import { candlesParamsValues } from "./candlesParamsValues";
+import { shares } from "./shares";
 
 export const candles = t.pgTable("invest_candles", {
   ...baseEntity,
-  instrumentId: t.varchar().notNull(),
+  shareId: t
+    .uuid()
+    .notNull()
+    .references(() => shares.id, { onDelete: "cascade" }),
   interval: t.varchar(),
   time: t.timestamp().notNull(),
   open: t
@@ -82,5 +88,13 @@ export const candles = t.pgTable("invest_candles", {
     mode: "number",
   }),
 });
+
+export const candlesRelations = relations(candles, ({ one, many }) => ({
+  customParams: many(candlesParamsValues),
+  share: one(shares, {
+    fields: [candles.shareId],
+    references: [shares.id],
+  }),
+}));
 
 export type Candle = typeof candles.$inferInsert;

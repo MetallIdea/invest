@@ -1,3 +1,5 @@
+import { setFilters, setSort } from "@/app-pages/HomePage/homeSlice";
+import { useAppDispatch, useAppSelector } from "@/state/store";
 import { Button, Input, Space } from "antd";
 import { useFormik } from "formik"
 
@@ -6,33 +8,46 @@ type Values = {
     minProfit: string;
 }
 
-type Props = {
-    onSubmit: (value: Values) => void
-}
+export function SharesFilter() {
+    const dispatch = useAppDispatch();
 
-export function SharesFilter({ onSubmit }: Props) {
-    const { values, handleChange, handleSubmit } = useFormik({
+    const { filters, sort } = useAppSelector(state => state.home);
+
+    const { values, handleChange, handleSubmit } = useFormik<Values>({
         initialValues: {
-            search: '',
-            minProfit: '',
+            search: filters.search,
+            minProfit: filters.minProfit ? filters.minProfit.toString() : '',
         },
         onSubmit: (values) => {
-            onSubmit(values);
+            dispatch(setFilters({
+                search: values.search,
+                minProfit: values.minProfit ? Number(values.minProfit) : undefined
+            }));
         }
-    })
+    });
+
+    const handleClickPrice = () => {
+        dispatch(setSort({ price: !sort.price }))
+    }
+
     return (
-        <form onSubmit={handleSubmit}>
-            <Space vertical={true}>
-                <Space.Compact>
-                    <Space.Addon>Найти</Space.Addon>
-                    <Input name={'search'} value={values.search} onChange={handleChange} />
-                </Space.Compact>
-                <Space.Compact>
-                    <Space.Addon>Рост больше %</Space.Addon>
-                    <Input name={'minProfit'} value={values.minProfit} onChange={handleChange} />
-                </Space.Compact>
-                <Button htmlType={'submit'}>Поиск</Button>
-            </Space>
-        </form>
+        <Space vertical>
+            <form onSubmit={handleSubmit}>
+                <Space vertical={true}>
+                    <Space.Compact>
+                        <Space.Addon>Найти</Space.Addon>
+                        <Input name={'search'} value={values.search} onChange={handleChange} />
+                    </Space.Compact>
+                    <Space.Compact>
+                        <Space.Addon>Рост больше %</Space.Addon>
+                        <Input name={'minProfit'} value={values.minProfit} onChange={handleChange} />
+                    </Space.Compact>
+                    <Button htmlType={'submit'}>Поиск</Button>
+                </Space>
+            </form>
+            <div>
+                <div onClick={handleClickPrice}>Цена</div>
+            </div>
+        </Space>
     )
 }

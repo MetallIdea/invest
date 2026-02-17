@@ -1,40 +1,22 @@
-import styles from "./page.module.css";
-import { desc, eq, gt, or } from "drizzle-orm";
-import { suggestions } from 'common/src/entities/suggestions';
-import { shares } from 'common/src/entities/shares';
+import { desc, eq } from "drizzle-orm";
 import { db } from "common/src/data/db";
-import { HomePage } from "@/modules/HomePage/HomePage";
-import { HomeContextProvider } from "@/modules/HomePage/HomeContext";
+import { HomePage } from "@/app-pages/HomePage/HomePage";
 import { candles } from "common/src/entities/candles";
+import { shares } from "common/src/entities/shares";
 
 const getInitialData = async () => {
-  const date = new Date();
-
-  if (date.getDay() === 6 || date.getDay() === 0) {
-    date.setDate(date.getDate() - 5);
-  } else {
-    date.setDate(date.getDate() - 3);
-  }
-
-  const lastSuggestions = await db.select().from(suggestions)
-    .where(or(gt(suggestions.buyTime, date)))
-    .innerJoin(shares, eq(shares.id, suggestions.instrumentId))
-    .orderBy(desc(suggestions.sell));
-
-  const allSuggestions = await db.select().from(suggestions)
-    .innerJoin(shares, eq(shares.id, suggestions.instrumentId))
-    .orderBy(desc(suggestions.buyTime));
-
-  const allSharesWithLastCandles = await db.select().from(shares)
-    .innerJoin(candles, eq(shares.figi, candles.instrumentId))
-    .where(gt(candles.diff, 0))
-    .orderBy(desc(candles.time), desc(candles.diff))
-    .limit(100);
+  const sharesWithCandles = await db.query.shares.findMany({
+    with: {
+      candles: {
+        limit: 5,
+        orderBy: desc(candles.time),
+      },
+    },
+    where: eq(shares.countryOfRisk, 'RU'),
+  });
 
   return {
-    lastSuggestions,
-    allSuggestions,
-    allSharesWithLastCandles,
+    sharesWithCandles,
   }
 }
 
@@ -42,10 +24,6 @@ export default async function Home() {
   const initialData = await getInitialData();
 
   return (
-    <div className={styles.page}>
-      <HomeContextProvider value={initialData}>
-        <HomePage />
-      </HomeContextProvider>
-    </div>
+    <HomePage initialData={initialData} />
   );
 }

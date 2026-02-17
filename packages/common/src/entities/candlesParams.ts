@@ -5,8 +5,8 @@ export const candlesParams = t.pgTable("invest_candles_params", {
   ...baseEntity,
   name: t.varchar(),
   description: t.varchar(),
-  order: t.varchar(),
-  calculate: t.varchar(),
+  order: t.numeric({ mode: "number" }),
+  calculate: t.varchar().notNull(),
 });
 
 export type CandleParams = typeof candlesParams.$inferInsert;

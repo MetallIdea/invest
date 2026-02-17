@@ -6,3 +6,5 @@ export const users = pgTable("users", {
   login: varchar().notNull(),
   password: varchar().notNull(),
 });
+
+export type User = typeof users.$inferInsert;

@@ -1,5 +1,5 @@
 import { db } from "common/src/data/db";
-import { desc, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { shares } from "common/src/entities/shares";
 import { fetchShares } from "common/src/requests/shares";
 

@@ -5,22 +5,22 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1769568317159,
-      "tag": "0000_aberrant_zemo",
+      "when": 1771248191057,
+      "tag": "0000_many_scrambler",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1770574239582,
-      "tag": "0001_woozy_sabra",
+      "when": 1771248208464,
+      "tag": "0001_parched_shockwave",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "7",
-      "when": 1770829685344,
-      "tag": "0002_chunky_dreadnoughts",
+      "when": 1771248213631,
+      "tag": "0002_tiresome_sabretooth",
       "breakpoints": true
     }
   ]

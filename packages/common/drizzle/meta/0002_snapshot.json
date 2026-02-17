@@ -1,6 +1,6 @@
 {
-  "id": "9e454367-2d62-4b0c-b675-68f53c7f6566",
-  "prevId": "087ba304-3244-4843-829c-ffb2ff354a16",
+  "id": "b6ce177f-3289-48a5-8bfe-5dc8f1936956",
+  "prevId": "42311c3e-9b69-4ffb-9dab-ee58cb090712",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -111,9 +111,9 @@
           "primaryKey": false,
           "notNull": false
         },
-        "instrument_id": {
-          "name": "instrument_id",
-          "type": "varchar",
+        "share_id": {
+          "name": "share_id",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
@@ -257,7 +257,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "invest_candles_share_id_invest_shares_id_fk": {
+          "name": "invest_candles_share_id_invest_shares_id_fk",
+          "tableFrom": "invest_candles",
+          "columnsFrom": [
+            "share_id"
+          ],
+          "tableTo": "invest_shares",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -308,7 +322,7 @@
         },
         "order": {
           "name": "order",
-          "type": "varchar",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": false
         },
@@ -316,7 +330,7 @@
           "name": "calculate",
           "type": "varchar",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},

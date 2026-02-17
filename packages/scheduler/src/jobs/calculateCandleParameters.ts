@@ -31,7 +31,7 @@ export async function calculateCandleParameters() {
     const allCandles = await db
       .select()
       .from(candles)
-      .where(eq(candles.instrumentId, allShares[i].figi))
+      .where(eq(candles.shareId, allShares[i].id))
       .orderBy(candles.time);
 
     let prevCandleParams = null;
@@ -73,9 +73,10 @@ export async function calculateCandleParameters() {
           ? prevCandleParams?.ema12 - prevCandleParams.ema26
           : null;
 
-      newCandleParams.signal = newCandleParams.macd && prevCandleParams?.signal
-        ? calcEMA(newCandleParams.macd, prevCandleParams.signal, k9)
-        : newCandleParams.macd;
+      newCandleParams.signal =
+        newCandleParams.macd && prevCandleParams?.signal
+          ? calcEMA(newCandleParams.macd, prevCandleParams.signal, k9)
+          : newCandleParams.macd;
 
       newCandleParams.signalValue =
         newCandleParams?.macd && newCandleParams.signal

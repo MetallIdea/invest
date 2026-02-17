@@ -1,16 +1,16 @@
 import { decrypt, encrypt } from "./encryption";
-import { users } from "common/src/entities/users";
+import { User } from "common/src/entities/users";
 import { cookies, headers } from "next/headers";
 
-export async function getUser(): Promise<typeof users.$inferSelect | null> {
+export async function getUser(): Promise<User | undefined> {
   const cookieStore = await cookies();
 
   const userString = cookieStore.get("user");
 
-  return userString?.value ? JSON.parse(decrypt(userString?.value)) : null;
+  return userString?.value ? JSON.parse(decrypt(userString?.value)) : undefined;
 }
 
-export async function setUser(user: typeof users.$inferSelect) {
+export async function setUser(user: User) {
   const cookieStore = await cookies();
 
   const expires = new Date();

@@ -2,7 +2,7 @@ import { db } from "common/src/data/db";
 import { candles } from "common/src/entities/candles";
 import { shares } from "common/src/entities/shares";
 import { fetchCandles } from "common/src/requests/cnadles";
-import { and, desc, eq, gte, lte } from "drizzle-orm";
+import { and, eq, gte, lte } from "drizzle-orm";
 import { calcCandle, calcPercent } from "common/src/utils/candles";
 
 export async function fetchOldCandles() {
@@ -47,10 +47,10 @@ export async function fetchOldCandles() {
         .from(candles)
         .where(
           and(
-            eq(candles.instrumentId, allShares[i].figi),
+            eq(candles.shareId, allShares[i].id),
             gte(candles.time, startTime),
-            lte(candles.time, endTime)
-          )
+            lte(candles.time, endTime),
+          ),
         );
 
       if (data.candles) {
@@ -78,7 +78,7 @@ export async function fetchOldCandles() {
 
           const existCandle = existCandles.find(
             (currCandle) =>
-              currCandle.time.getTime() === new Date(candle.time).getTime()
+              currCandle.time.getTime() === new Date(candle.time).getTime(),
           );
 
           if (existCandle) {
@@ -90,7 +90,7 @@ export async function fetchOldCandles() {
               .where(eq(candles.id, existCandle.id));
           } else {
             await db.insert(candles).values({
-              instrumentId: allShares[i].figi,
+              shareId: allShares[i].id,
               time: new Date(candle.time),
               ...fields,
             });

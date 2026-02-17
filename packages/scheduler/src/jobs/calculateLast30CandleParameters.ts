@@ -34,10 +34,7 @@ export async function calculateLast30CandleParameters() {
       .select()
       .from(candles)
       .where(
-        and(
-          eq(candles.instrumentId, allShares[i].figi),
-          gte(candles.time, startDate)
-        )
+        and(eq(candles.shareId, allShares[i].id), gte(candles.time, startDate)),
       )
       .orderBy(candles.time);
 

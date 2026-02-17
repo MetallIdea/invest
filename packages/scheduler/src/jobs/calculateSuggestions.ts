@@ -29,7 +29,7 @@ export async function calculateSuggestions() {
     const allCandles = await db
       .select()
       .from(candles)
-      .where(eq(candles.instrumentId, allShares[i].figi))
+      .where(eq(candles.shareId, allShares[i].id))
       .orderBy(candles.time);
 
     for (let j = 0; j < allCandles.length; j++) {

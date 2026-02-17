@@ -19,7 +19,7 @@ export async function fetchLastCandles() {
     const [lastCandle] = await db
       .select()
       .from(candles)
-      .where(eq(candles.instrumentId, allShares[i].figi))
+      .where(eq(candles.shareId, allShares[i].id))
       .limit(1)
       .orderBy(desc(candles.time));
 
@@ -92,7 +92,7 @@ export async function fetchLastCandles() {
             .where(eq(candles.id, lastCandle.id));
         } else {
           await db.insert(candles).values({
-            instrumentId: allShares[i].figi,
+            shareId: allShares[i].id,
             time: new Date(candle.time),
             ...fields,
           });

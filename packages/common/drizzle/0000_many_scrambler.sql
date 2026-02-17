@@ -14,7 +14,7 @@ CREATE TABLE "invest_candles" (
 	"updated_at" timestamp,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"deleted_at" timestamp,
-	"instrument_id" varchar NOT NULL,
+	"share_id" uuid NOT NULL,
 	"interval" varchar,
 	"time" timestamp NOT NULL,
 	"open" numeric NOT NULL,
@@ -47,8 +47,8 @@ CREATE TABLE "invest_candles_params" (
 	"deleted_at" timestamp,
 	"name" varchar,
 	"description" varchar,
-	"order" varchar,
-	"calculate" varchar
+	"order" numeric,
+	"calculate" varchar NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "invest_candles_params_values" (
@@ -143,6 +143,7 @@ CREATE TABLE "users" (
 );
 --> statement-breakpoint
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "invest_candles" ADD CONSTRAINT "invest_candles_share_id_invest_shares_id_fk" FOREIGN KEY ("share_id") REFERENCES "public"."invest_shares"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "invest_candles_params_values" ADD CONSTRAINT "invest_candles_params_values_candle_id_invest_candles_id_fk" FOREIGN KEY ("candle_id") REFERENCES "public"."invest_candles"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "invest_candles_params_values" ADD CONSTRAINT "invest_candles_params_values_param_id_invest_candles_params_id_fk" FOREIGN KEY ("param_id") REFERENCES "public"."invest_candles_params"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "invest_deals" ADD CONSTRAINT "invest_deals_share_id_invest_shares_id_fk" FOREIGN KEY ("share_id") REFERENCES "public"."invest_shares"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
