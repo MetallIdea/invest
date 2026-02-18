@@ -13,7 +13,7 @@ export default async function MyPage() {
         throw new Error('User not auth')
     }
 
-    const allAccounts = await db.select().from(accounts).where(eq(accounts.id, user.id));
+    const allAccounts = await db.select().from(accounts).where(eq(accounts.id, user.id!));
 
     return (
         <div className={styles.root}>

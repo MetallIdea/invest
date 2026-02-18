@@ -17,9 +17,9 @@ export default function Login() {
         }
 
         await db.insert(accounts).values({
-            accountId: '1',
+            accountId: '11',
             name: userData.name,
-            userId: user.id,
+            userId: user.id!,
             money: 0,
         });
     }

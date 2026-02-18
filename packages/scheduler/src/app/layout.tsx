@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import styles from './layout.module.css';
-import { getUser } from "common/src/utils/user";
+import { AntdRegistry } from "@ant-design/nextjs-registry";
 
 export const metadata: Metadata = {
   title: "AlCoInvest - Алгоритмическое компьютерное инвестирование",
@@ -12,12 +12,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await getUser();
   return (
     <html lang="en" className={styles.html}>
       <body className={styles.body}>
-        {user && (<div>{user.login}</div>)}
-        {children}
+        <AntdRegistry>
+          {children}
+        </AntdRegistry>
       </body>
     </html>
   );

@@ -10,7 +10,7 @@ import cn from 'classnames';
 export default async function Shares() {
     const allShares = await db.select().from(shares).where(eq(shares.countryOfRisk, 'RU')).orderBy(shares.name);
 
-    const lastCandles = await Promise.all(allShares.map(share => db.select().from(candles).where(eq(candles.instrumentId, share.figi)).limit(10).orderBy(desc(candles.time))))
+    const lastCandles = await Promise.all(allShares.map(share => db.select().from(candles).where(eq(candles.shareId, share.id)).limit(10).orderBy(desc(candles.time))))
 
     const calcUp = (candles: Candle[]) => {
         if (candles.length === 0) {

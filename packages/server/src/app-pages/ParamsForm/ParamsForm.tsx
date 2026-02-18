@@ -21,7 +21,10 @@ export function ParamsForm({ item }: Props) {
             calculate: item?.calculate ?? '',
         },
         onSubmit: async (values) => {
-            await submitForm(values);
+            await submitForm({
+                ...values,
+                order: values.order ? Number(values.order) : null,
+            });
             router.push('/params')
         },
     })

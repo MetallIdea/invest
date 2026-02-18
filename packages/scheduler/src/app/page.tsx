@@ -9,16 +9,6 @@ export default async function Home() {
   const jobs = await getAllJobs();
 
   return (
-    <div className={styles.page}>
-      <div>
-        <div>
-          Запущенные процессы
-        </div>
-        <div
-          className={styles.items}>
-          <HomePage jobs={jobs} />
-        </div>
-      </div>
-    </div>
+    <HomePage jobs={jobs} />
   );
 }

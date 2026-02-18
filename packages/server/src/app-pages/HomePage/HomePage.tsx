@@ -12,7 +12,7 @@ import { Candle } from "common/src/entities/candles";
 import cn from 'classnames';
 
 const calcMacd = (candles: Candle[]) => {
-    if (candles.length > 2 && candles[0].macd > candles[1].macd &&
+    if (candles.length > 3 && candles[0].macd && candles[1].macd && candles[2].macd && candles[3].macd && candles[0].macd > candles[1].macd &&
         candles[1].macd > candles[2].macd &&
         candles[2].macd < candles[3].macd
     ) {
@@ -23,7 +23,7 @@ const calcMacd = (candles: Candle[]) => {
 }
 
 const calcSMA = (candles: Candle[]) => {
-    if (candles[0]?.sma27 && candles[3]?.sma27 && candles[0].sma27 > candles[3].sma27
+    if (candles.length > 3 && candles[0]?.sma27 && candles[3]?.sma27 && candles[0].sma27 > candles[3].sma27
     ) {
         return 'Рост'
     }

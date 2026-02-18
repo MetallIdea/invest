@@ -9,6 +9,7 @@ import { Job } from 'common/src/entities/jobs';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { saveJobs } from './actions';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 
 type Props = {
     jobs: Job[];
@@ -61,7 +62,20 @@ export function HomePage({ jobs: initialJobs }: Props) {
                             [styles.isRunning]: job.isRunning,
                         })}>
                             <div>{job.name}</div>
-                            <div><Input name={`jobs[${index}].schedule`} value={values.jobs[index].schedule} onChange={handleChange} /></div>
+                            <div>
+                                <Space.Compact size="large">
+                                    <Input name={`jobs[${index}].schedule`} value={values.jobs[index].schedule} onChange={handleChange} />
+
+                                    <Space.Addon>
+                                        <a
+                                            href={`https://crontab.guru/#${values.jobs[index].schedule.replace(/\s/g, '_')}`}
+                                            target={'_blank'}
+                                        >
+                                            <QuestionCircleOutlined />
+                                        </a>
+                                    </Space.Addon>
+                                </Space.Compact>
+                            </div>
                             <div>{job.method}</div>
                             <div>{job.lastRun?.toISOString()}</div>
                             <div>{job.nextRun?.toISOString()}</div>
