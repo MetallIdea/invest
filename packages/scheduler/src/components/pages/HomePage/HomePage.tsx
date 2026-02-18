@@ -18,7 +18,7 @@ type Props = {
 export function HomePage({ jobs: initialJobs }: Props) {
     const [jobs, setJobs] = useState(initialJobs);
 
-    const { values, handleChange, handleSubmit } = useFormik({
+    const { values, isSubmitting, handleChange, handleSubmit } = useFormik({
         initialValues: {
             jobs: initialJobs,
         },
@@ -82,7 +82,7 @@ export function HomePage({ jobs: initialJobs }: Props) {
                             <Checkbox name={`jobs[${index}].isEnabled`} checked={values.jobs[index].isEnabled ?? undefined} onChange={handleChange} />
                             <Space>
                                 <Button onClick={handleJobClick(job.id)}>Запустить раз</Button>
-                                <Button htmlType="submit">Сохранить</Button>
+                                <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>Сохранить</Button>
                             </Space>
                         </div>
                     ))}

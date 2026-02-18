@@ -3,7 +3,7 @@ import { db } from "../data/db";
 import { Job, jobs } from "../entities/jobs";
 
 export async function getAllJobs() {
-  return await db.select().from(jobs);
+  return await db.select().from(jobs).orderBy(jobs.isEnabled, jobs.name);
 }
 
 export async function getJobById(id: string) {
