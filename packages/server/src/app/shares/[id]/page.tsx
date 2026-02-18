@@ -7,19 +7,35 @@ import cn from "classnames";
 import { CandleCharts } from "@/components/charts/CandleCharts";
 import { suggestions } from "common/src/entities/suggestions";
 
+const getInitialData = async ({ id }: { id: string }) => {
+    const startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - 3);
+
+    const share = await db.query.shares.findFirst({
+        with: {
+            candles: {
+                where: and(eq(candles.shareId, id), gte(candles.time, startDate)),
+                orderBy: desc(candles.time),
+            },
+        },
+        where: eq(shares.id, id),
+    });
+
+    return {
+        share,
+    }
+}
+
 export default async function Share({ params }: {
     params: Promise<{ id: string }>
 }) {
     const { id } = await params;
 
-    const startDate = new Date();
-    startDate.setMonth(startDate.getMonth() - 3);
+    const { share } = await getInitialData({ id });
 
-    const [share] = await db.select().from(shares).where(eq(shares.id, id));
-    const allCandles = await db.select().from(candles).where(and(eq(candles.instrumentId, share.figi), gte(candles.time, startDate)))
-        .orderBy(desc(candles.time));
-    const shareSuggestions = await db.select().from(suggestions).where(and(eq(suggestions.instrumentId, share.id), gte(suggestions.buyTime, startDate)))
-        .orderBy(desc(suggestions.buyTime));
+    if (!share) {
+        return null;
+    }
 
     return (
         <div className={styles.page}>
@@ -31,10 +47,10 @@ export default async function Share({ params }: {
             >Перейти
             </a></div>
             <div>
-                <CandleCharts data={allCandles} suggestions={shareSuggestions} />
+                <CandleCharts data={share.candles} />
             </div>
             <div>
-                {allCandles.map((candle) => (
+                {share.candles.map((candle) => (
                     <div key={candle.id} className={cn(styles.candle, {
                         [styles.green]: candle.diff > 0,
                         [styles.red]: candle.diff < 0

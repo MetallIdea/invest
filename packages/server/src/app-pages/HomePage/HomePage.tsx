@@ -8,6 +8,28 @@ import { SharesFilter } from "@/components/SharesFilter/SharesFilter";
 import { useAppSelector } from "@/state/store";
 import { ShareWithCandles } from "common/src/entities/shares";
 import { useSetInitialData } from "@/hooks/useSetInitialData";
+import { Candle } from "common/src/entities/candles";
+import cn from 'classnames';
+
+const calcMacd = (candles: Candle[]) => {
+    if (candles.length > 2 && candles[0].macd > candles[1].macd &&
+        candles[1].macd > candles[2].macd &&
+        candles[2].macd < candles[3].macd
+    ) {
+        return 'ВнизВВерх'
+    }
+
+    return 'Ничего'
+}
+
+const calcSMA = (candles: Candle[]) => {
+    if (candles[0]?.sma27 && candles[3]?.sma27 && candles[0].sma27 > candles[3].sma27
+    ) {
+        return 'Рост'
+    }
+
+    return 'Ничего'
+}
 
 type Props = {
     initialData: Partial<HomeState>;
@@ -26,10 +48,8 @@ export const HomePage = memo(({ initialData }: Props) => {
     }
 
     const sortFunction = (a: ShareWithCandles, b: ShareWithCandles) => {
-        if (sort.price !== undefined) {
-            if (a.candles[0] && b.candles[0]) {
-                return sort.price ? a.candles[0].diff - b.candles[0].diff : b.candles[0].diff - a.candles[0].diff;
-            }
+        if (a.candles[0] && b.candles[0]) {
+            return sort.price ? a.candles[0].diff - b.candles[0].diff : b.candles[0].diff - a.candles[0].diff;
         }
         return 0;
     }
@@ -43,7 +63,9 @@ export const HomePage = memo(({ initialData }: Props) => {
                 sharesWithCandles?.filter(filterFunction).sort(sortFunction).map((share) => (
                     <BaseCard
                         key={share.id}
-                        className={styles.item}
+                        className={cn(styles.item, {
+                            [styles.green]: calcMacd(share.candles) === 'ВнизВВерх',
+                        })}
                         title={<a href={`/shares/${share.id}`}>{share.ticker}</a>}
                         rightTitle={<a
                             href={`https://www.tbank.ru/invest/stocks/${share.ticker}`}
@@ -52,7 +74,10 @@ export const HomePage = memo(({ initialData }: Props) => {
                         </a>}
                         items={[
                             {
-                                value: (share.candles[0]?.macd ?? 0) - (share.candles[1]?.macd ?? 0),
+                                value: calcMacd(share.candles),
+                            },
+                            {
+                                value: calcSMA(share.candles),
                             },
                             {
                                 value: share.candles[0]?.diff

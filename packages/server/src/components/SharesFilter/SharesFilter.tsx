@@ -26,9 +26,9 @@ export function SharesFilter() {
         }
     });
 
-    const handleClickPrice = () => {
-        dispatch(setSort({ price: !sort.price }))
-    }
+    const handleClickPrice = () => dispatch(setSort({ price: !sort.price }));
+
+    const handleClickMACD = () => dispatch(setSort({ macd: !sort.macd }));
 
     return (
         <Space vertical>
@@ -45,9 +45,10 @@ export function SharesFilter() {
                     <Button htmlType={'submit'}>Поиск</Button>
                 </Space>
             </form>
-            <div>
+            <Space>
                 <div onClick={handleClickPrice}>Цена</div>
-            </div>
+                <div onClick={handleClickMACD}>MACD</div>
+            </Space>
         </Space>
     )
 }

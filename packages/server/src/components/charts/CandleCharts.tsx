@@ -43,7 +43,7 @@ const OPTIONS_MACD: ApexOptions = {
 
 type Props = {
     data: Candle[];
-    suggestions: {
+    suggestions?: {
         buy: number | null;
         sell: number | null;
         buyTime: Date | null;
@@ -59,8 +59,8 @@ export const CandleCharts = ({ data, suggestions }: Props) => {
                 x: item.time,
                 y: [item.open, item.high, item.low, item.close],
                 fillColor: (() => {
-                    const suggestionBuy = suggestions.find((sug) => sug.buyTime?.getTime() === item.time.getTime());
-                    const suggestionSell = suggestions.find((sug) => (sug.sellTime && sug.sellTime.getTime() === item.time.getTime()));
+                    const suggestionBuy = suggestions?.find((sug) => sug.buyTime?.getTime() === item.time.getTime());
+                    const suggestionSell = suggestions?.find((sug) => (sug.sellTime && sug.sellTime.getTime() === item.time.getTime()));
 
                     if (suggestionSell?.sell) {
                         return '#b00000ff'

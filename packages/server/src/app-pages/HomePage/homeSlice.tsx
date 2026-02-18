@@ -10,6 +10,7 @@ export type HomeState = {
     };
     sort: {
         price?: boolean;
+        macd?: boolean;
     }
 };
 
