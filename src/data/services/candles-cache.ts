@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, desc, eq, sql } from 'drizzle-orm';
 import { db } from '@/data/db';
 import { getCandlesByShare } from '@/api/tinvest';
 import { candles } from '@/data/entities/candles';
@@ -29,14 +29,31 @@ function quotationToString(value: { units?: string | number; nano?: number } | n
   return `${sign}${intPart}.${fracPart.toString().padStart(9, '0')}`;
 }
 
+/**
+ * Возвращает дату последней сохранённой дневной свечи для инструмента
+ * или null, если свечей ещё нет.
+ */
+async function getLastCandleTime(figi: string): Promise<Date | null> {
+  const [last] = await db
+    .select({ time: candles.time })
+    .from(candles)
+    .where(and(eq(candles.figi, figi), eq(candles.interval, INTERVAL)))
+    .orderBy(desc(candles.time))
+    .limit(1);
+
+  return last?.time ?? null;
+}
+
 export interface SyncCandlesResult {
   candlesCount: number;
   sharesCount: number;
 }
 
 /**
- * Скачивает дневные свечи за последние DAYS_BACK дней для всех акций из таблицы shares
- * и сохраняет их в таблицу candles (upsert по figi + interval + time).
+ * Синхронизирует дневные свечи для всех акций из таблицы shares.
+ * Для каждой акции запрашиваются свечи начиная с даты последней сохранённой свечи
+ * (включая её) и до текущего момента; если свечей ещё нет — за последние DAYS_BACK дней.
+ * Новые свечи добавляются, совпавшие по figi + interval + time обновляются.
  * Возвращает количество сохранённых свечей и обработанных акций.
  */
 export async function syncCandles(): Promise<SyncCandlesResult> {
@@ -47,12 +64,16 @@ export async function syncCandles(): Promise<SyncCandlesResult> {
   }
 
   const to = new Date();
-  const from = new Date(to.getTime() - DAYS_BACK * 24 * 60 * 60 * 1000);
 
   let total = 0;
 
   for (const share of shareList) {
     try {
+      // Запрашиваем свечи начиная с даты последней сохранённой свечи (включая её),
+      // либо за последние DAYS_BACK дней, если свечей в БД ещё нет.
+      const lastTime = await getLastCandleTime(share.figi!);
+      const from = lastTime ?? new Date(to.getTime() - DAYS_BACK * 24 * 60 * 60 * 1000);
+
       const candlesResult = await getCandlesByShare(share.figi, from, to, INTERVAL);
 
       const rows = candlesResult
@@ -71,11 +92,19 @@ export async function syncCandles(): Promise<SyncCandlesResult> {
       for (let i = 0; i < rows.length; i += BATCH_SIZE) {
         const chunk = rows.slice(i, i + BATCH_SIZE);
 
-        console.log(chunk);
-
+        // upsert: новые свечи добавляются, свеча с совпавшей датой обновляется
         await db.insert(candles)
           .values(chunk)
-          .onConflictDoNothing();
+          .onConflictDoUpdate({
+            target: [candles.figi, candles.interval, candles.time],
+            set: {
+              open: sql`excluded.open`,
+              high: sql`excluded.high`,
+              low: sql`excluded.low`,
+              close: sql`excluded.close`,
+              volume: sql`excluded.volume`,
+            },
+          });
       }
 
       total += rows.length;
