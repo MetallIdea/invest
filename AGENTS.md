@@ -44,10 +44,14 @@ src/
     ├── schema.ts           # barrel: реэкспорт entities
     ├── entities/
     │   ├── base-entity.ts  # общие колонки для таблиц
+    │   ├── candles.ts      # таблица candles (свечи)
+    │   ├── indicators.ts   # таблица indicators (значения индикаторов)
     │   ├── shares.ts       # таблица shares (справочник акций)
     │   └── users.ts        # таблица users
     └── services/
-        └── shares-cache.ts # кеширование акций из Tinkoff в shares
+        ├── candles-cache.ts    # синхронизация свечей из Tinkoff в candles
+        ├── indicators-cache.ts # расчёт и сохранение индикаторов (VWAP)
+        └── shares-cache.ts     # кеширование акций из Tinkoff в shares
 ```
 
 ## Ключевые модули
@@ -60,8 +64,15 @@ src/
 - [`users.ts`](src/data/entities/users.ts:4) — таблица `users`: `fullName` (notNull), `email` (unique) + base.
 - [`shares.ts`](src/data/entities/shares.ts:4) — таблица `shares` (справочник акций): `name`, `ticker`, `figi` (unique),
   `sector`, `country` + base.
+- [`indicators.ts`](src/data/entities/indicators.ts:4) — таблица `indicators` (значения индикаторов):
+  `figi`, `time`, `interval`, `indicator`, `parameters` (`jsonb`), `value` (`numeric`) + base;
+  уникальность по `figi + interval + time + indicator + parameters`.
 - [`shares-cache.ts`](src/data/services/shares-cache.ts:18) — `syncShares()`: выгружает акции из Tinkoff (`getAllShares`)
   и upsert'ит их в `shares` по `figi` (`onConflictDoUpdate`, батчами по 500).
+- [`candles-cache.ts`](src/data/services/candles-cache.ts:59) — `syncCandles()`: дневные свечи из Tinkoff в `candles`
+  (накопительно с последней сохранённой даты, upsert по `figi + interval + time`).
+- [`indicators-cache.ts`](src/data/services/indicators-cache.ts:18) — `calculateVwap()`: считает VWAP по дневным свечам
+  (накопительно: `Σ(typicalPrice·volume) / Σvolume`) для всех акций и upsert'ит в `indicators`.
 - Каждая сущность экспортирует тип `typeof table.$inferInsert` (например, `User`, `WebSite`).
 
 ### Tinkoff Invest ([`src/api/tinvest.ts`](src/api/tinvest.ts))

@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { Alert, Button, Space } from 'antd';
-import { syncCandlesAction, syncSharesAction, type SyncResult } from '@/actions/sync';
+import { calculateVwapAction, syncCandlesAction, syncSharesAction, type SyncResult } from '@/actions/sync';
 
-type SyncKind = 'shares' | 'candles';
+type SyncKind = 'shares' | 'candles' | 'vwap';
 
 export function SyncPanel() {
     const [loading, setLoading] = useState<SyncKind | null>(null);
@@ -39,6 +39,14 @@ export function SyncPanel() {
                     onClick={() => run('candles', syncCandlesAction)}
                 >
                     Получение свечей
+                </Button>
+                <Button
+                    type="primary"
+                    loading={loading === 'vwap'}
+                    disabled={loading !== null}
+                    onClick={() => run('vwap', calculateVwapAction)}
+                >
+                    Расчёт VWAP
                 </Button>
             </Space>
 

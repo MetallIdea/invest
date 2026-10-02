@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { syncCandles } from '@/data/services/candles-cache';
+import { calculateVwap } from '@/data/services/indicators-cache';
 import { syncShares } from '@/data/services/shares-cache';
 
 export interface SyncResult {
@@ -42,6 +43,28 @@ export async function syncCandlesAction(): Promise<SyncResult> {
     return {
       ok: false,
       message: error instanceof Error ? error.message : 'Не удалось синхронизировать свечи.',
+    };
+  }
+}
+
+/** Вычисляет индикатор VWAP по сохранённым свечам для всех акций и сохраняет его в базу. */
+export async function calculateVwapAction(): Promise<SyncResult> {
+  try {
+    const result = await calculateVwap();
+    revalidatePath('/');
+
+    if (result.sharesCount === 0) {
+      return { ok: false, message: 'В базе нет акций. Сначала выполните «Получение акций».' };
+    }
+
+    return {
+      ok: true,
+      message: `VWAP рассчитан: ${result.valuesCount} значений (инструментов: ${result.sharesCount}).`,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : 'Не удалось рассчитать VWAP.',
     };
   }
 }
