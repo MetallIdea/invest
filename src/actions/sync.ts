@@ -1,0 +1,47 @@
+'use server';
+
+import { revalidatePath } from 'next/cache';
+import { syncCandles } from '@/data/services/candles-cache';
+import { syncShares } from '@/data/services/shares-cache';
+
+export interface SyncResult {
+  ok: boolean;
+  message: string;
+}
+
+/** Запрашивает акции из Tinkoff Invest API и сохраняет их в базу. */
+export async function syncSharesAction(): Promise<SyncResult> {
+  try {
+    const count = await syncShares();
+    revalidatePath('/');
+
+    return { ok: true, message: `Акции синхронизированы: ${count} шт.` };
+  } catch (error) {
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : 'Не удалось синхронизировать акции.',
+    };
+  }
+}
+
+/** Запрашивает свечи из Tinkoff Invest API для акций из базы и сохраняет их. */
+export async function syncCandlesAction(): Promise<SyncResult> {
+  try {
+    const result = await syncCandles();
+    revalidatePath('/');
+
+    if (result.sharesCount === 0) {
+      return { ok: false, message: 'В базе нет акций. Сначала выполните «Получение акций».' };
+    }
+
+    return {
+      ok: true,
+      message: `Свечи синхронизированы: ${result.candlesCount} шт. (инструментов: ${result.sharesCount}).`,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : 'Не удалось синхронизировать свечи.',
+    };
+  }
+}

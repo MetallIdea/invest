@@ -37,13 +37,17 @@ src/
 │   └── page.module.css     # стили главной страницы
 ├── api/
 │   └── tinvest.ts          # обёртка Tinkoff Invest SDK
-├── constants/
+├── constants/              # константы
+├── components/             # компоненты
 └── data/
     ├── db.ts               # синглтон `db` (drizzle + pg Pool)
     ├── schema.ts           # barrel: реэкспорт entities
-    └── entities/
-        ├── base-entity.ts  # общие колонки для таблиц
-        ├── users.ts        # таблица users
+    ├── entities/
+    │   ├── base-entity.ts  # общие колонки для таблиц
+    │   ├── shares.ts       # таблица shares (справочник акций)
+    │   └── users.ts        # таблица users
+    └── services/
+        └── shares-cache.ts # кеширование акций из Tinkoff в shares
 ```
 
 ## Ключевые модули
@@ -54,6 +58,10 @@ src/
   `id` (`uuid` PK `defaultRandom`), `createdAt`/`createdBy`, `updatedAt` (`$onUpdate`), `updatedBy`.
   Всегда разворачивается через `...baseEntity` в таблицах.
 - [`users.ts`](src/data/entities/users.ts:4) — таблица `users`: `fullName` (notNull), `email` (unique) + base.
+- [`shares.ts`](src/data/entities/shares.ts:4) — таблица `shares` (справочник акций): `name`, `ticker`, `figi` (unique),
+  `sector`, `country` + base.
+- [`shares-cache.ts`](src/data/services/shares-cache.ts:18) — `syncShares()`: выгружает акции из Tinkoff (`getAllShares`)
+  и upsert'ит их в `shares` по `figi` (`onConflictDoUpdate`, батчами по 500).
 - Каждая сущность экспортирует тип `typeof table.$inferInsert` (например, `User`, `WebSite`).
 
 ### Tinkoff Invest ([`src/api/tinvest.ts`](src/api/tinvest.ts))
@@ -64,11 +72,13 @@ src/
 ## Конвенции
 
 - **Импорты**: алиас `@/*` → `src/*` (см. `tsconfig.json` paths).
-- **Стиль**: только одинарные кавычки (ESLint error), строгий TS.
+- **Стиль**: только одинарные кавычки (ESLint error), строгий TS. В названии файла используется CebabCase. Название компонентов в PascalCase.
 - **БД**: в Drizzle указан `casing: 'snake_case'` (и в `drizzle.config.ts`) — поля в коде пишутся camelCase (`fullName` → `full_name`), имена таблиц — snake_case (`web_sites`).
 - **Сущности**: `pgTable` + спред `baseEntity`, рядом тип `$inferInsert`.
 - **Миграции**: пока только `db:push` (папка `drizzle/` для метаданных, без history).
 - **SSR**: Данные из БД на страницу передаются через getInitialData
+- **Компоненты**: Используются функциональные компоненты. Экспорт через `export function` или `export const`. Используются готовые компоненты из библиотеки `andd`. Компоненты хранятся внутри папки `src/components/.
+- **Взаимодействие с сервером**: Для запросов на сервер используются server actions.
 
 ## Подводные камни
 
