@@ -45,6 +45,10 @@
   min-width: 0.75rem;
 }
 
+.shareLink:hover {
+  text-decoration: underline;
+}
+
 .changePositive {
   color: #2e7d32;
 }

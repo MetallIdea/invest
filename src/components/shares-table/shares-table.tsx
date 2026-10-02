@@ -31,6 +31,13 @@ const SORTABLE_COLUMNS: { field: SortField; label: string }[] = [
 /** Форматирует дату свечи в формате ДД.ММ.ГГГГ. */
 const formatDate = (date: Date): string => date.toLocaleDateString('ru-RU');
 
+/** Базовый адрес страницы акции на Т-Банке. */
+const TBANK_STOCK_URL = 'https://www.tbank.ru/invest/stocks';
+
+/** Возвращает ссылку на страницу акции на Т-Банке по тикеру. */
+const getStockUrl = (ticker: string): string =>
+    `${TBANK_STOCK_URL}/${encodeURIComponent(ticker.toUpperCase())}/`;
+
 /** Убирает хвостовые нули у цены (numeric из БД приходит строкой). */
 const formatClose = (value: string | null): string => {
     if (!value) {
@@ -165,7 +172,16 @@ export function SharesTable({ shares }: SharesTableProps) {
 
                     return (
                         <tr key={share.figi}>
-                            <td>{share.name}</td>
+                            <td>
+                                <a
+                                    href={getStockUrl(share.ticker)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={styles.shareLink}
+                                >
+                                    {share.name}
+                                </a>
+                            </td>
                             <td>{share.ticker}</td>
                             <td>{share.figi}</td>
                             <td>{share.lastCandleTime ? formatDate(share.lastCandleTime) : '—'}</td>

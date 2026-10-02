@@ -1,0 +1,143 @@
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 900px;
+}
+
+.table th,
+.table td {
+  border: 1px solid rgba(127, 127, 127, 0.3);
+  padding: 0.5rem 1rem;
+  text-align: left;
+}
+
+.table th {
+  background-color: rgba(127, 127, 127, 0.15);
+  color: var(--foreground);
+}
+
+.table td {
+  color: var(--foreground);
+}
+
+.table tr:hover {
+  background-color: rgba(127, 127, 127, 0.1);
+}
+
+.sortButton {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.sortButton:hover,
+.sortButtonActive {
+  text-decoration: underline;
+}
+
+.sortArrow {
+  min-width: 0.75rem;
+}
+
+.shareLink:hover {
+  text-decoration: underline;
+}
+
+/* ячейка веса со шкалой заполнения */
+.weightCell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 8rem;
+}
+
+.weightValue {
+  min-width: 3rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.weightBuy .weightValue {
+  color: #2e7d32;
+}
+
+.weightSell .weightValue {
+  color: #c62828;
+}
+
+.weightBarTrack {
+  flex: 1;
+  height: 0.5rem;
+  border-radius: 0.25rem;
+  background-color: rgba(127, 127, 127, 0.2);
+  overflow: hidden;
+}
+
+.weightBarFill {
+  display: block;
+  height: 100%;
+  border-radius: 0.25rem;
+}
+
+.weightBuy .weightBarFill {
+  background-color: #2e7d32;
+}
+
+.weightSell .weightBarFill {
+  background-color: #c62828;
+}
+
+/* бейдж сигнала */
+.signalBadge {
+  display: inline-block;
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.signalBuy {
+  background-color: rgba(46, 125, 50, 0.15);
+  color: #2e7d32;
+}
+
+.signalSell {
+  background-color: rgba(198, 40, 40, 0.15);
+  color: #c62828;
+}
+
+.signalNeutral {
+  background-color: rgba(127, 127, 127, 0.2);
+  color: var(--foreground);
+}
+
+@media (prefers-color-scheme: dark) {
+  .weightBuy .weightValue {
+    color: #66bb6a;
+  }
+
+  .weightSell .weightValue {
+    color: #ef5350;
+  }
+
+  .weightBuy .weightBarFill {
+    background-color: #66bb6a;
+  }
+
+  .weightSell .weightBarFill {
+    background-color: #ef5350;
+  }
+
+  .signalBuy {
+    color: #66bb6a;
+  }
+
+  .signalSell {
+    color: #ef5350;
+  }
+}

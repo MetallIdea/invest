@@ -32,13 +32,18 @@
 src/
 ├── app/                    # Next.js App Router
 │   ├── layout.tsx          # AntdRegistry, навлинк → /websites
-│   ├── page.tsx            # Home (заглушка, WIP)
+│   ├── page.tsx            # Акции: SyncPanel, WeightsTable, SharesTable
 │   ├── globals.css         # глобальные стили (CSS-переменные, темная тема)
 │   └── page.module.css     # стили главной страницы
+├── actions/
+│   └── sync.ts             # server actions синхронизации и расчётов
 ├── api/
 │   └── tinvest.ts          # обёртка Tinkoff Invest SDK
 ├── constants/              # константы
 ├── components/             # компоненты
+│   ├── shares-table/       # таблица акций: свечи + VWAP (сортировка по клику)
+│   ├── sync-panel/         # кнопки запуска sync/расчётов (antd)
+│   └── weights-table/      # таблица весов покупки/продажи (сортировка по клику)
 └── data/
     ├── db.ts               # синглтон `db` (drizzle + pg Pool)
     ├── schema.ts           # barrel: реэкспорт entities
@@ -46,11 +51,13 @@ src/
     │   ├── base-entity.ts  # общие колонки для таблиц
     │   ├── candles.ts      # таблица candles (свечи)
     │   ├── indicators.ts   # таблица indicators (значения индикаторов)
+    │   ├── share-weights.ts# таблица share_weights (веса покупки/продажи)
     │   ├── shares.ts       # таблица shares (справочник акций)
     │   └── users.ts        # таблица users
     └── services/
         ├── candles-cache.ts    # синхронизация свечей из Tinkoff в candles
-        ├── indicators-cache.ts # расчёт и сохранение индикаторов (VWAP)
+        ├── indicators-cache.ts # расчёт и сохранение индикаторов (VWAP, ATR, RSI, MACD, EMA)
+        ├── share-weights-cache.ts # расчёт весов покупки/продажи по индикаторам
         └── shares-cache.ts     # кеширование акций из Tinkoff в shares
 ```
 
@@ -71,8 +78,19 @@ src/
   и upsert'ит их в `shares` по `figi` (`onConflictDoUpdate`, батчами по 500).
 - [`candles-cache.ts`](src/data/services/candles-cache.ts:59) — `syncCandles()`: дневные свечи из Tinkoff в `candles`
   (накопительно с последней сохранённой даты, upsert по `figi + interval + time`).
-- [`indicators-cache.ts`](src/data/services/indicators-cache.ts:18) — `calculateVwap()`: считает VWAP по дневным свечам
-  (накопительно: `Σ(typicalPrice·volume) / Σvolume`) для всех акций и upsert'ит в `indicators`.
+- [`indicators-cache.ts`](src/data/services/indicators-cache.ts:29) — расчёт и сохранение индикаторов в `indicators`:
+  - `calculateVwap()`: VWAP (накопительно: `Σ(typicalPrice·volume) / Σvolume`);
+  - `calculateIndicators()`: ATR (14), RSI (9, 14), MACD (12/26/9, 5/13/9, 3/10/16 — линия, сигнал, гистограмма)
+    и EMA (9, 21). Индикаторы в таблице: `vwap`, `atr`, `rsi`, `macd`/`macd_signal`/`macd_hist`, `ema`.
+- [`share-weights.ts`](src/data/entities/share-weights.ts:4) — таблица `share_weights` (веса сигналов):
+  `figi` (unique), `buyWeight`/`sellWeight` (`numeric` 0–100), `signal` (`buy`/`sell`/`neutral`),
+  `lastIndicatorTime` + base.
+- [`share-weights-cache.ts`](src/data/services/share-weights-cache.ts) — `calculateShareWeights()`:
+  по последним значениям индикаторов (RSI 14, MACD-гистограмма 12/26/9 нормированная на ATR,
+  отклонение цены от EMA 9/21 и VWAP) считает веса покупки/продажи (взвешенная сумма 25/25/30/20,
+  нормализация по доступным группам) и upsert'ит их в `share_weights` по `figi`.
+- [`weights-table.tsx`](src/components/weights-table/weights-table.tsx) — таблица весов с сортировкой
+  по тикеру, весу покупки, весу продажи и сигналу; отображает шкалы заполнения и бейджи сигналов.
 - Каждая сущность экспортирует тип `typeof table.$inferInsert` (например, `User`, `WebSite`).
 
 ### Tinkoff Invest ([`src/api/tinvest.ts`](src/api/tinvest.ts))

@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { Alert, Button, Space } from 'antd';
-import { calculateVwapAction, syncCandlesAction, syncSharesAction, type SyncResult } from '@/actions/sync';
+import { calculateIndicatorsAction, calculateVwapAction, calculateWeightsAction, syncCandlesAction, syncSharesAction, type SyncResult } from '@/actions/sync';
 
-type SyncKind = 'shares' | 'candles' | 'vwap';
+type SyncKind = 'shares' | 'candles' | 'vwap' | 'indicators' | 'weights';
 
 export function SyncPanel() {
     const [loading, setLoading] = useState<SyncKind | null>(null);
@@ -47,6 +47,22 @@ export function SyncPanel() {
                     onClick={() => run('vwap', calculateVwapAction)}
                 >
                     Расчёт VWAP
+                </Button>
+                <Button
+                    type="primary"
+                    loading={loading === 'indicators'}
+                    disabled={loading !== null}
+                    onClick={() => run('indicators', calculateIndicatorsAction)}
+                >
+                    Расчёт индикаторов
+                </Button>
+                <Button
+                    type="primary"
+                    loading={loading === 'weights'}
+                    disabled={loading !== null}
+                    onClick={() => run('weights', calculateWeightsAction)}
+                >
+                    Расчёт весов
                 </Button>
             </Space>
 

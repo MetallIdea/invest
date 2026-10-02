@@ -2,7 +2,8 @@
 
 import { revalidatePath } from 'next/cache';
 import { syncCandles } from '@/data/services/candles-cache';
-import { calculateVwap } from '@/data/services/indicators-cache';
+import { calculateIndicators, calculateVwap } from '@/data/services/indicators-cache';
+import { calculateShareWeights } from '@/data/services/share-weights-cache';
 import { syncShares } from '@/data/services/shares-cache';
 
 export interface SyncResult {
@@ -65,6 +66,50 @@ export async function calculateVwapAction(): Promise<SyncResult> {
     return {
       ok: false,
       message: error instanceof Error ? error.message : 'Не удалось рассчитать VWAP.',
+    };
+  }
+}
+
+/** Вычисляет технические индикаторы (ATR, RSI, MACD, EMA) по сохранённым свечам для всех акций. */
+export async function calculateIndicatorsAction(): Promise<SyncResult> {
+  try {
+    const result = await calculateIndicators();
+    revalidatePath('/');
+
+    if (result.sharesCount === 0) {
+      return { ok: false, message: 'В базе нет акций. Сначала выполните «Получение акций».' };
+    }
+
+    return {
+      ok: true,
+      message: `Индикаторы рассчитаны: ${result.valuesCount} значений (инструментов: ${result.sharesCount}).`,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : 'Не удалось рассчитать индикаторы.',
+    };
+  }
+}
+
+/** Рассчитывает веса «покупка»/«продажа» по последним значениям индикаторов для всех акций. */
+export async function calculateWeightsAction(): Promise<SyncResult> {
+  try {
+    const result = await calculateShareWeights();
+    revalidatePath('/');
+
+    if (result.sharesCount === 0) {
+      return { ok: false, message: 'В базе нет акций. Сначала выполните «Получение акций».' };
+    }
+
+    return {
+      ok: true,
+      message: `Веса рассчитаны: ${result.weightsCount} акций.`,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : 'Не удалось рассчитать веса.',
     };
   }
 }

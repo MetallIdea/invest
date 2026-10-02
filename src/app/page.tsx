@@ -1,9 +1,11 @@
-import { asc, desc, eq, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, sql } from 'drizzle-orm';
 import { db } from '@/data/db';
 import { candles } from '@/data/entities/candles';
 import { indicators } from '@/data/entities/indicators';
 import { shares } from '@/data/entities/shares';
+import { shareWeights } from '@/data/entities/share-weights';
 import { SharesTable } from '@/components/shares-table/shares-table';
+import { WeightsTable } from '@/components/weights-table/weights-table';
 import { SyncPanel } from '../components/sync-panel/sync-panel';
 import styles from './page.module.css';
 
@@ -11,6 +13,9 @@ export const dynamic = 'force-dynamic';
 
 const CANDLE_INTERVAL_DAY = 'CANDLE_INTERVAL_DAY';
 const VWAP_INDICATOR = 'vwap';
+const VOLATILITY_INDICATOR = 'volatility';
+const VOLATILITY_PARAMS = { period: 21 };
+const COUNTRY_RU = 'Российская Федерация';
 
 const getInitialData = async () => {
   // последняя (по времени) дневная свеча для каждого figi
@@ -58,27 +63,59 @@ const getInitialData = async () => {
     .orderBy(indicators.figi, desc(indicators.time))
     .as('last_vwaps');
 
-  const sharesList = await db
-    .select({
-      name: shares.name,
-      ticker: shares.ticker,
-      figi: shares.figi,
-      lastCandleClose: lastCandles.close,
-      previousCandleClose: prevCandles.close,
-      lastCandleTime: lastCandles.time,
-      lastVwap: lastVwaps.value,
-      lastVwapTime: lastVwaps.time,
+  // последнее (по времени) значение годовой волатильности для каждого figi
+  const lastVolatilities = db
+    .selectDistinctOn([indicators.figi], {
+      figi: indicators.figi,
+      value: indicators.value,
     })
-    .from(shares)
-    .leftJoin(lastCandles, eq(shares.figi, lastCandles.figi))
-    .leftJoin(lastVwaps, eq(shares.figi, lastVwaps.figi))
-    .leftJoin(prevCandles, eq(shares.figi, prevCandles.figi))
-    .where(eq(shares.country, 'Российская Федерация'))
-    .orderBy(asc(shares.ticker));
+    .from(indicators)
+    .where(
+      and(
+        eq(indicators.indicator, VOLATILITY_INDICATOR),
+        sql`${indicators.parameters} = ${JSON.stringify(VOLATILITY_PARAMS)}::jsonb`,
+      ),
+    )
+    .orderBy(indicators.figi, desc(indicators.time))
+    .as('last_volatilities');
 
-  console.log(sharesList);
+  const [sharesList, weightsList] = await Promise.all([
+    db
+      .select({
+        name: shares.name,
+        ticker: shares.ticker,
+        figi: shares.figi,
+        lastCandleClose: lastCandles.close,
+        previousCandleClose: prevCandles.close,
+        lastCandleTime: lastCandles.time,
+        lastVwap: lastVwaps.value,
+        lastVwapTime: lastVwaps.time,
+      })
+      .from(shares)
+      .leftJoin(lastCandles, eq(shares.figi, lastCandles.figi))
+      .leftJoin(lastVwaps, eq(shares.figi, lastVwaps.figi))
+      .leftJoin(prevCandles, eq(shares.figi, prevCandles.figi))
+      .where(eq(shares.country, COUNTRY_RU))
+      .orderBy(asc(shares.ticker)),
+    db
+      .select({
+        name: shares.name,
+        ticker: shares.ticker,
+        figi: shares.figi,
+        buyWeight: shareWeights.buyWeight,
+        sellWeight: shareWeights.sellWeight,
+        signal: shareWeights.signal,
+        volatility: lastVolatilities.value,
+        calculatedAt: shareWeights.lastIndicatorTime,
+      })
+      .from(shares)
+      .leftJoin(shareWeights, eq(shares.figi, shareWeights.figi))
+      .leftJoin(lastVolatilities, eq(shares.figi, lastVolatilities.figi))
+      .where(eq(shares.country, COUNTRY_RU))
+      .orderBy(asc(shares.ticker)),
+  ]);
 
-  return { shares: sharesList };
+  return { shares: sharesList, weights: weightsList };
 };
 
 export default async function Home() {
@@ -88,6 +125,9 @@ export default async function Home() {
     <div className={styles.page}>
       <h1 className={styles.title}>Акции</h1>
       <SyncPanel />
+      <h2 className={styles.sectionTitle}>Веса покупки / продажи</h2>
+      <WeightsTable weights={initialData.weights} />
+      <h2 className={styles.sectionTitle}>Свечи и индикаторы</h2>
       <SharesTable shares={initialData.shares} />
     </div>
   );
