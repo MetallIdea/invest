@@ -56,7 +56,7 @@ src/
     │   └── users.ts        # таблица users
     └── services/
         ├── candles-cache.ts    # синхронизация свечей из Tinkoff в candles
-        ├── indicators-cache.ts # расчёт и сохранение индикаторов (VWAP, ATR, RSI, MACD, EMA)
+        ├── indicators-cache.ts # расчёт и сохранение индикаторов (VWAP, ATR, RSI, MACD, EMA, volatility)
         ├── share-weights-cache.ts # расчёт весов покупки/продажи по индикаторам
         └── shares-cache.ts     # кеширование акций из Tinkoff в shares
 ```
@@ -80,15 +80,18 @@ src/
   (накопительно с последней сохранённой даты, upsert по `figi + interval + time`).
 - [`indicators-cache.ts`](src/data/services/indicators-cache.ts:29) — расчёт и сохранение индикаторов в `indicators`:
   - `calculateVwap()`: VWAP (накопительно: `Σ(typicalPrice·volume) / Σvolume`);
-  - `calculateIndicators()`: ATR (14), RSI (9, 14), MACD (12/26/9, 5/13/9, 3/10/16 — линия, сигнал, гистограмма)
-    и EMA (9, 21). Индикаторы в таблице: `vwap`, `atr`, `rsi`, `macd`/`macd_signal`/`macd_hist`, `ema`.
+  - `calculateIndicators()`: ATR (14), RSI (9, 14), MACD (12/26/9, 5/13/9, 3/10/16 — линия, сигнал, гистограмма),
+    EMA (9, 21) и историческая волатильность (21 день, годовая, в %).
+    Индикаторы в таблице: `vwap`, `atr`, `rsi`, `macd`/`macd_signal`/`macd_hist`, `ema`, `volatility`.
 - [`share-weights.ts`](src/data/entities/share-weights.ts:4) — таблица `share_weights` (веса сигналов):
   `figi` (unique), `buyWeight`/`sellWeight` (`numeric` 0–100), `signal` (`buy`/`sell`/`neutral`),
   `lastIndicatorTime` + base.
 - [`share-weights-cache.ts`](src/data/services/share-weights-cache.ts) — `calculateShareWeights()`:
   по последним значениям индикаторов (RSI 14, MACD-гистограмма 12/26/9 нормированная на ATR,
-  отклонение цены от EMA 9/21 и VWAP) считает веса покупки/продажи (взвешенная сумма 25/25/30/20,
-  нормализация по доступным группам) и upsert'ит их в `share_weights` по `figi`.
+  отклонение цены от EMA 9/21, VWAP и волатильность) считает веса покупки/продажи
+  (взвешенная сумма 20/20/25/15/20: RSI/MACD/EMA/VWAP/волатильность — низкая волатильность
+  усиливает покупку, высокая смещает к продаже; нормализация по доступным группам)
+  и upsert'ит их в `share_weights` по `figi`.
 - [`weights-table.tsx`](src/components/weights-table/weights-table.tsx) — таблица весов с сортировкой
   по тикеру, весу покупки, весу продажи и сигналу; отображает шкалы заполнения и бейджи сигналов.
 - Каждая сущность экспортирует тип `typeof table.$inferInsert` (например, `User`, `WebSite`).

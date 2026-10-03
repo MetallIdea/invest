@@ -16,19 +16,23 @@ const EMA_PERIODS = [9, 21];
 const VOLATILITY_PERIOD = 21;
 
 /** Веса групп индикаторов при расчёте итогового веса (сумма 100). */
-const WEIGHT_RSI = 25;
-const WEIGHT_MACD = 25;
-const WEIGHT_EMA = 30;
-const WEIGHT_VWAP = 20;
+const WEIGHT_RSI = 20;
+const WEIGHT_MACD = 20;
+const WEIGHT_EMA = 25;
+const WEIGHT_VWAP = 15;
+const WEIGHT_VOLATILITY = 20;
 
 /**
- * Базовая годовая волатильность (%): при значениях ниже неё сигнал не корректируется.
+ * Годовая волатильность (%), при которой сигнал группы «волатильность» равен нулю.
  * Типичный уровень для российских акций — порядка 40% годовых.
  */
-const VOLATILITY_REF = 40;
+const VOLATILITY_NEUTRAL = 40;
 
-/** Сила коррекции силы сигнала на волатильность (0 — коррекция выключена). */
-const VOLATILITY_STRENGTH = 1.5;
+/**
+ * Отклонение годовой волатильности от нейтрального уровня, при котором
+ * сигнал группы «волатильность» достигает максимума (±100% силы).
+ */
+const VOLATILITY_SATURATION = 25;
 
 /** Порог разницы весов для формирования сигнала. */
 const SIGNAL_THRESHOLD = 15;
@@ -111,6 +115,21 @@ function vwapScores(close: number, vwap: number): { buy: number; sell: number } 
   };
 }
 
+/**
+ * Оценка волатильности: чем ниже годовая волатильность, тем надёжнее актив —
+ * растёт вес покупки; при высокой волатильности сигнал смещается к продаже.
+ * Нейтральный уровень — VOLATILITY_NEUTRAL, насыщение — отклонение
+ * VOLATILITY_SATURATION (например, 15% → покупка 100%, 65% → продажа 100%).
+ */
+function volatilityScores(volatilityPct: number): { buy: number; sell: number } {
+  const score = clamp((VOLATILITY_NEUTRAL - volatilityPct) / VOLATILITY_SATURATION, -1, 1);
+
+  return {
+    buy: score > 0 ? score : 0,
+    sell: score < 0 ? -score : 0,
+  };
+}
+
 /** Возвращает последнее (по времени) значение индикатора для каждого инструмента. */
 async function lastIndicatorValues(
   alias: string,
@@ -141,17 +160,14 @@ async function lastIndicatorValues(
  * волатильность) и сохраняет результат в таблицу share_weights.
  *
  * Итоговый вес — взвешенная сумма оценок сигналов (0–100):
- *   - RSI (14) — 25%;
- *   - MACD-гистограмма (12/26/9), нормированная на ATR — 25%;
- *   - отклонение цены от EMA (9 и 21) — 30%;
- *   - отклонение цены от VWAP — 20%.
+ *   - RSI (14) — 20%;
+ *   - MACD-гистограмма (12/26/9), нормированная на ATR — 20%;
+ *   - отклонение цены от EMA (9 и 21) — 25%;
+ *   - отклонение цены от VWAP — 15%;
+ *   - волатильность (низкая усиливает покупку, высокая — продажу) — 20%.
  *
  * Если часть индикаторов отсутствует, веса пересчитываются пропорционально
  * доступным группам.
- *
- * Коррекция на волатильность: чем волатильнее акция (годовая историческая
- * волатильность выше VOLATILITY_REF), тем ниже доверие к сигналу —
- * разница между весом покупки и продажи сжимается вокруг их среднего.
  *
  * Повторный расчёт обновляет записи (upsert по figi).
  */
@@ -280,31 +296,25 @@ export async function calculateShareWeights(): Promise<CalculateWeightsResult> {
       }
     }
 
+    // Волатильность как отдельная группа сигналов: низкая волатильность
+    // усиливает покупку, высокая — смещает сигнал к продаже.
+    const volatilityRow = volatilityMap.get(figi);
+    if (volatilityRow?.value) {
+      const scores = volatilityScores(Number(volatilityRow.value));
+      groups.push({ weight: WEIGHT_VOLATILITY, ...scores });
+
+      if (volatilityRow.time) {
+        times.push(volatilityRow.time);
+      }
+    }
+
     if (groups.length === 0) {
       continue;
     }
 
     const totalWeight = groups.reduce((sum, group) => sum + group.weight, 0);
-    let buyWeight = (groups.reduce((sum, group) => sum + group.weight * group.buy, 0) / totalWeight) * 100;
-    let sellWeight = (groups.reduce((sum, group) => sum + group.weight * group.sell, 0) / totalWeight) * 100;
-
-    // Коррекция силы сигнала на волатильность: чем волатильнее акция, тем ниже
-    // доверие к сигналу — разница весов сжимается вокруг их среднего значения.
-    const volatilityRow = volatilityMap.get(figi);
-    const volatilityPct = volatilityRow?.value ? Number(volatilityRow.value) : null;
-
-    if (volatilityPct !== null && volatilityPct > VOLATILITY_REF) {
-      const excess = (volatilityPct - VOLATILITY_REF) / VOLATILITY_REF;
-      const damping = 1 / (1 + excess * VOLATILITY_STRENGTH);
-
-      const center = (buyWeight + sellWeight) / 2;
-      buyWeight = center + (buyWeight - center) * damping;
-      sellWeight = center + (sellWeight - center) * damping;
-
-      if (volatilityRow?.time) {
-        times.push(volatilityRow.time);
-      }
-    }
+    const buyWeight = (groups.reduce((sum, group) => sum + group.weight * group.buy, 0) / totalWeight) * 100;
+    const sellWeight = (groups.reduce((sum, group) => sum + group.weight * group.sell, 0) / totalWeight) * 100;
 
     const difference = buyWeight - sellWeight;
     const signal = difference >= SIGNAL_THRESHOLD ? 'buy' : difference <= -SIGNAL_THRESHOLD ? 'sell' : 'neutral';
